@@ -23,9 +23,6 @@ importers:
       react-dom:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
-      styled:
-        specifier: ^1.0.0
-        version: 1.0.0
       styled-components:
         specifier: ^6.4.3
         version: 6.4.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -885,9 +882,6 @@ packages:
       react-native:
         optional: true
 
-  styled@1.0.0:
-    resolution: {integrity: sha512-mPbinkDY7K//Jxi7hZBNSiUF3Q9LE8NHrlUuQXLHCFZcVJeSXQh/Kn4C7lWf8Obre3iyYHo0OqA3WptZrwST/A==}
-
   stylis@4.3.6:
     resolution: {integrity: sha512-yQ3rwFWRfwNUY7H5vpU0wfdkNSnvnJinhF9830Swlaxl03zsOjCfmX0ugac+3LtK0lYSgwL/KXc8oYL3mG4YFQ==}
 
@@ -1733,8 +1727,6 @@ snapshots:
       stylis: 4.3.6
     optionalDependencies:
       react-dom: 19.2.7(react@19.2.7)
-
-  styled@1.0.0: {}
 
   stylis@4.3.6: {}
 
