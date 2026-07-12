@@ -1,18 +1,31 @@
-import { useState } from 'react'
+import { useState,useRef } from 'react'
 import './App.css'
 import { Canvas } from '@react-three/fiber'
 import { Box } from './components/objects/box'
 import { Stars, OrbitControls } from "@react-three/drei";
-import { Mainmenu } from './components/UI/Mainmenu';
+import { Title } from './components/pages/title';
+import { Register } from './components/pages/register';
+import { Result } from './components/pages/result';
 
 function App() {
   const [Gamestate,setGamestate] = useState('title')
+  
+  const canvasRef = useRef(null);
+
+  const onCanvasClick = () =>{
+    setGamestate('result');
+  }
 
   return (
     <>
-     {Gamestate=='title'&&<Mainmenu setGamestate={setGamestate}/>}
+     {Gamestate=='title'&&<Title setGamestate={setGamestate}/>}
+     {Gamestate=='register'&&<Register setGamestate={setGamestate}/>}  
     {Gamestate=='play'&&<div id="CanvasContainer">
-      <Canvas shadows={'soft'}>
+      <Canvas 
+        ref = {canvasRef}
+        shadows={'soft'}
+        onClick ={onCanvasClick} 
+        >
         <ambientLight />
         <pointLight position={[0, 0, 0]} />
         <Box />
@@ -28,6 +41,7 @@ function App() {
       </Canvas>
           <div className="crosshair"></div>
     </div>}
+      {Gamestate =='result'&&<Result setGamestate={setGamestate}/>}
     </>
   )
 }
