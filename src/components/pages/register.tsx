@@ -1,3 +1,5 @@
+import  styled  from "styled-components";
+
 export const Register = ({ setGamestate }: { setGamestate: (state: string) => void }) =>{
     return(<div>
         <h1>顔登録画面です</h1>
