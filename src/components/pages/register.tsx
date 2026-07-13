@@ -1,4 +1,3 @@
-import  styled  from "styled-components";
 
 export const Register = ({ setGamestate }: { setGamestate: (state: string) => void }) =>{
     return(<div>
