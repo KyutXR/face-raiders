@@ -1,31 +1,36 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame ,useThree} from "@react-three/fiber";
 import { useRef, useEffect, useState } from "react";
 import { Box } from "../objects/box";
 import { OrbitControls, Stars } from "@react-three/drei";
-import { Euler, Quaternion, Vector3 } from "three";
+import { Euler, Quaternion, Vector3, VideoTexture } from "three";
 
 // constraints（条件設定）で背面カメラを指定
-const constraints = {
-  audio: false,
-  video: {
-    facingMode: { exact: "environment" } // 背面カメラ
-  }
-};
 
-// カメラ映像を取得してvideoタグにセット
-navigator.mediaDevices.getUserMedia(constraints)
-  .then((stream) => {
-    const videoElement = document.querySelector('video');
-    if(videoElement!=null)
-    {
-      videoElement.srcObject = stream;
-    videoElement.play();  
-    }
+interface CameraBackgroundProps {
+  videoElement: HTMLVideoElement | null;
+}
+
+function CameraBackground({ videoElement }: CameraBackgroundProps) {
+  const { scene } = useThree();
+
+  useEffect(() => {
+    if (!videoElement) return;
+
+    // 1. video要素からThree.jsのVideoTextureを作成
+    const texture = new VideoTexture(videoElement);
     
-  })
-  .catch((err) => {
-    console.error("カメラの起動に失敗しました: ", err);
-  });
+    // 2. シーンの背景にテクスチャを適用
+    scene.background = texture;
+
+    // クリーンアップ処理
+    return () => {
+      scene.background = null;
+      texture.dispose();
+    };
+  }, [videoElement, scene]);
+
+  return null;
+}
 
 
 // 画面を北に向け、カメラを水平にする補正用クォータニオン（X軸まわりに -90度）
@@ -69,6 +74,37 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
     const canvasRef = useRef(null);
     const [needsPermission, setNeedsPermission] = useState(false);
     const [permissionGranted, setPermissionGranted] = useState(false);
+    const [video, setVideo] = useState<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    // 3. 背面カメラのストリームを取得
+    const constraints = { video: { facingMode: 'environment' } };
+    let activeStream: MediaStream | null = null;
+    
+    navigator.mediaDevices?.getUserMedia(constraints)
+      .then((stream) => {
+        activeStream = stream;
+        // 裏側で再生するvideo要素を動的に生成
+        const vid = document.createElement('video');
+        vid.srcObject = stream;
+        vid.autoplay = true;
+        vid.playsInline = true;
+        vid.muted = true; // 自動再生のブロックを防ぐため必須
+        
+        vid.onloadedmetadata = () => {
+          vid.play().catch((err) => console.error("ビデオ再生エラー:", err));
+          setVideo(vid); // 映像が準備できたら状態を更新
+        };
+      })
+      .catch((err) => console.error("カメラ取得エラー:", err));
+
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
 
     useEffect(() => {
         const DeviceOrientationEventAny = DeviceOrientationEvent as any;
@@ -130,23 +166,12 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
 
     return (
         <div id="CanvasContainer">
-            <video
-                 style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                zIndex: 1, // Canvasより後ろに配置
-                }}></video>
               <Canvas 
                 ref = {canvasRef}
                 shadows={'soft'}
                 onClick ={onCanvasClick} 
-                style ={{position: 'absolute', top: 0, left: 0, zIndex: 2}}
                 >
-                
+                {video && <CameraBackground videoElement={video} />}
                 <ambientLight />
                 <pointLight position={[0, 0, 0]} />
                 <GyroCameraController/>
