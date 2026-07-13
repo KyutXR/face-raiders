@@ -1,8 +1,8 @@
-import { Canvas, useFrame ,useThree} from "@react-three/fiber";
+import { Canvas,useThree} from "@react-three/fiber";
 import { useRef, useEffect, useState } from "react";
 import { Box } from "../objects/box";
 import { OrbitControls, Stars } from "@react-three/drei";
-import { Euler, Quaternion, Vector3, VideoTexture } from "three";
+import { VideoTexture } from "three";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 
 // constraints（条件設定）で背面カメラを指定
