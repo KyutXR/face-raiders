@@ -4,6 +4,30 @@ import { Box } from "../objects/box";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { Euler, Quaternion, Vector3 } from "three";
 
+// constraints（条件設定）で背面カメラを指定
+const constraints = {
+  audio: false,
+  video: {
+    facingMode: { exact: "environment" } // 背面カメラ
+  }
+};
+
+// カメラ映像を取得してvideoタグにセット
+navigator.mediaDevices.getUserMedia(constraints)
+  .then((stream) => {
+    const videoElement = document.querySelector('video');
+    if(videoElement!=null)
+    {
+      videoElement.srcObject = stream;
+    videoElement.play();  
+    }
+    
+  })
+  .catch((err) => {
+    console.error("カメラの起動に失敗しました: ", err);
+  });
+
+
 // 画面を北に向け、カメラを水平にする補正用クォータニオン（X軸まわりに -90度）
 const alignQuaternion = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -Math.PI / 2);
 
@@ -106,6 +130,7 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
 
     return (
         <div id="CanvasContainer">
+            <video></video>
               <Canvas 
                 ref = {canvasRef}
                 shadows={'soft'}
