@@ -49,12 +49,13 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
     }, []);
 
     const requestPermission = async () => {
+        const DeviceOrientationEventAny = DeviceOrientationEvent as any;
         if (
-            typeof DeviceOrientationEvent !== "undefined" &&
-            typeof DeviceOrientationEvent.requestPermission === "function"
+            typeof DeviceOrientationEventAny !== "undefined" &&
+            typeof DeviceOrientationEventAny.requestPermission === "function"
         ) {
             try {
-                const response = await DeviceOrientationEvent.requestPermission();
+                const response = await DeviceOrientationEventAny.requestPermission();
                 if (response === "granted") {
                     setPermissionGranted(true);
                     setNeedsPermission(false);
@@ -101,7 +102,7 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
                 >
                 <ambientLight />
                 <pointLight position={[0, 0, 0]} />
-                {permissionGranted && <GyroCameraController />}
+                <GyroCameraController/>
                 <Box />
                 <Stars
                   radius={100} // 星の点滅(拡大)度合い
@@ -113,7 +114,7 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
                 />
                 <OrbitControls />
               </Canvas>
-              <div className="crosshair"></div>
-        </div>
+                  <div className="crosshair"></div>
+            </div>
     );
 }
