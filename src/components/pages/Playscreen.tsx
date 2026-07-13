@@ -37,10 +37,11 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
     const [permissionGranted, setPermissionGranted] = useState(false);
 
     useEffect(() => {
+        const DeviceOrientationEventAny = DeviceOrientationEvent as any;
         // iOS 13+ の場合は確認が必要
         if (
-            typeof DeviceOrientationEvent !== "undefined" &&
-            typeof DeviceOrientationEvent.requestPermission === "function"
+            typeof DeviceOrientationEventAny !== "undefined" &&
+            typeof DeviceOrientationEventAny.requestPermission === "function"
         ) {
             setNeedsPermission(true);
         } else {
