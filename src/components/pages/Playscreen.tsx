@@ -38,7 +38,7 @@ export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (sta
                       saturation={9} // 星の彩度
                       speed={3} // 点滅のスピード
                     />
-                    {/* <OrbitControls /> */}//開発環境用
+                    <OrbitControls />//開発環境用
                   </Canvas>
                   <div className="crosshair"></div>
             </div>
