@@ -5,12 +5,15 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
+import { BulletRenderer } from "../renderers/BulletRenderer";
+import type { BulletRendererRef } from "../renderers/BulletRenderer";
 
-export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => void })=>{
+export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (state: string) => void })=>{
     const canvasRef = useRef(null);
+    const bulletRendererRef = useRef<BulletRendererRef>(null);
 
     const onCanvasClick = ()=>{
-        setGamestate('result');//画面クリックでリザルト画面を出力
+        bulletRendererRef.current?.shoot(); // 画面クリックで弾を発射する
     };
 
     return (
@@ -24,7 +27,8 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
                     <CameraBackground />
                     <ambientLight />
                     <pointLight position={[0, 0, 0]} />
-                    <GyroCameraController/>
+                    <GyroCameraController/> //開発するときはctrl+/で消してもいい
+                    <BulletRenderer ref={bulletRendererRef} />
                     <Box />
                     <Stars
                       radius={100} // 星の点滅(拡大)度合い
@@ -34,7 +38,7 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
                       saturation={9} // 星の彩度
                       speed={3} // 点滅のスピード
                     />
-                    <OrbitControls />
+                    {/* <OrbitControls /> */}//開発環境用
                   </Canvas>
                   <div className="crosshair"></div>
             </div>
