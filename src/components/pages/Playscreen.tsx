@@ -1,12 +1,13 @@
 import { Canvas } from "@react-three/fiber";
 import { useRef } from "react";
 import { Box } from "../objects/box";
-import { OrbitControls, Stars } from "@react-three/drei";
+import { OrbitControls, Stars}from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
 import { BulletRenderer } from "../renderers/BulletRenderer";
 import type { BulletRendererRef } from "../renderers/BulletRenderer";
+import { Physics ,RigidBody} from "@react-three/rapier";
 
 export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (state: string) => void })=>{
     const canvasRef = useRef(null);
@@ -24,12 +25,14 @@ export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (sta
                     shadows={'soft'}
                     onClick ={onCanvasClick} 
                     >
+                    <Physics>
                     <CameraBackground />
                     <ambientLight />
                     <pointLight position={[0, 0, 0]} />
                     <GyroCameraController/> //開発するときはctrl+/で消してもいい
                     <BulletRenderer ref={bulletRendererRef} />
-                    <Box />
+                    
+                    <RigidBody colliders="cuboid" restitution={0}type="fixed"><Box /></RigidBody>
                     <Stars
                       radius={100} // 星の点滅(拡大)度合い
                       depth={50} // 星の深さ
@@ -38,7 +41,8 @@ export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (sta
                       saturation={9} // 星の彩度
                       speed={3} // 点滅のスピード
                     />
-                    <OrbitControls />//開発環境用
+                    <OrbitControls/>//開発環境用
+                    </Physics>
                   </Canvas>
                   <div className="crosshair"></div>
             </div>
