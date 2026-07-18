@@ -6,13 +6,14 @@ import { Result } from './components/pages/result';
 import { Playscreen } from './components/pages/Playscreen';
 
 function App() {
-  const [Gamestate,setGamestate] = useState('title')
+  const [Gamestate,setGamestate] = useState('title');
+  const [StageNum,setStageNum] = useState(1);
 
   return (
     <>
      {Gamestate=='title'&&<Title setGamestate={setGamestate}/>}
      {Gamestate=='register'&&<Register setGamestate={setGamestate}/>}  
-     {Gamestate=='play'&&<Playscreen setGamestate={setGamestate}/>}
+     {Gamestate=='play'&&<Playscreen setGamestate={setGamestate} stageNum={StageNum}/>}
      {Gamestate =='result'&&<Result setGamestate={setGamestate}/>}
     </>
   )

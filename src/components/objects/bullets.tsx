@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { RigidBody, type RapierRigidBody } from '@react-three/rapier';
 import { ScorePopup } from './ScorePopup';
+import { HitParticles } from './HitParticles';
 
 export interface Bulletinfo {
     current_position: Vector3;
@@ -44,15 +45,19 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
 
   const handleCollision = () => {
     if (!isIntersect) {
-      setIsIntersect(true);
-      if (rigidBodyRef.current) {
-        // 衝突した位置を取得してスコアポップアップの発生位置とする
-        const translation = rigidBodyRef.current.translation();
-        setScorePos(new Vector3(translation.x, translation.y, translation.z));
-
-        // 衝突した瞬間に速度を0にし、重力（gravityScale={1}）で真下に落とす
-        rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      }
+      // 物理エンジンのロックを避けるため、状態更新と物理操作を遅延させる
+      setTimeout(() => {
+        setIsIntersect(true);
+        if (rigidBodyRef.current) {
+          try {
+            const translation = rigidBodyRef.current.translation();
+            setScorePos(new Vector3(translation.x, translation.y, translation.z));
+            rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+          } catch (e) {
+            console.error("Error updating bullet physics on collision:", e);
+          }
+        }
+      }, 0);
     }
   };
 
@@ -62,6 +67,7 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
     <>
       <RigidBody 
         ref={rigidBodyRef}
+        name="bullet"
         colliders="ball" 
         restitution={0} 
         gravityScale={isIntersect ? 1 : 0}
@@ -76,6 +82,9 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
       
       {/* 衝突時にスコアポップアップをレンダリング */}
       {isIntersect && scorePos && <ScorePopup position={scorePos} />}
+
+      {/* 衝突時に火花パーティクルをレンダリング */}
+      {isIntersect && scorePos && <HitParticles position={scorePos} />}
     </>
   );
 }

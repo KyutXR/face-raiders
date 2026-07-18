@@ -1,15 +1,21 @@
 import { Canvas } from "@react-three/fiber";
 import { useRef } from "react";
 import { Box } from "../objects/box";
-import { OrbitControls, Stars}from "@react-three/drei";
+import { OrbitControls, Stars, Text }from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
 import { BulletRenderer } from "../renderers/BulletRenderer";
 import type { BulletRendererRef } from "../renderers/BulletRenderer";
 import { Physics ,RigidBody} from "@react-three/rapier";
+import { Enemyrenderer } from "../renderers/EnemyRenderer";
 
-export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (state: string) => void })=>{
+interface PlayscreenProps {
+    setGamestate: (state: string) => void;
+    stageNum: number;
+}
+
+export const Playscreen = ({ setGamestate, stageNum }: PlayscreenProps)=>{
     const canvasRef = useRef(null);
     const bulletRendererRef = useRef<BulletRendererRef>(null);
 
@@ -31,7 +37,7 @@ export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (sta
                     <pointLight position={[0, 0, 0]} />
                     <GyroCameraController/> //開発するときはctrl+/で消してもいい
                     <BulletRenderer ref={bulletRendererRef} />
-                    
+                    <Enemyrenderer stage={stageNum}/>
                     <RigidBody colliders="cuboid" restitution={0}type="fixed"><Box /></RigidBody>
                     <Stars
                       radius={100} // 星の点滅(拡大)度合い
@@ -41,8 +47,11 @@ export const Playscreen = ({ setGamestate: _setGamestate }: { setGamestate: (sta
                       saturation={9} // 星の彩度
                       speed={3} // 点滅のスピード
                     />
-                    <OrbitControls/>//開発環境用
                     </Physics>
+                    <OrbitControls/>//開発環境用
+
+                    {/* スコアテキスト(ScorePopup)のフォントアセット・シェーダーの初回読込によるフリーズ(Jank)を防ぐプリロード用ダミー */}
+                    <Text visible={false}>Preload Font</Text>
                   </Canvas>
                   <div className="crosshair"></div>
             </div>
