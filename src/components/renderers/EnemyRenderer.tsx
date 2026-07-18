@@ -4,9 +4,10 @@ import { loadStageInfo } from "../../functions/Load";
 
 interface Props {
     stage: number;
+    setGamestate: (state: string) => void;
 }
 
-export const Enemyrenderer = ({ stage }: Props) => {
+export const Enemyrenderer = ({ stage, setGamestate }: Props) => {
     const stagedata = useMemo(() => loadStageInfo(stage), [stage]);
     
     // 現在のウェーブ番号
@@ -75,6 +76,15 @@ export const Enemyrenderer = ({ stage }: Props) => {
                 waveTransitionTimeout.current = window.setTimeout(() => {
                     setCurrentWave((prev) => prev + 1);
                 }, 1000);
+            } else if (stagedata && currentWave === stagedata.enemies.length - 1) {
+                // ★ 最後のウェーブの敵をすべて倒した（ステージクリア）
+                // 1.5秒の余韻（最後の敵が落下する時間など）を置いてからリザルト画面に遷移
+                if (waveTransitionTimeout.current) {
+                    clearTimeout(waveTransitionTimeout.current);
+                }
+                waveTransitionTimeout.current = window.setTimeout(() => {
+                    setGamestate("result");
+                }, 1500);
             }
         }
     };

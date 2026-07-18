@@ -15,7 +15,7 @@ interface PlayscreenProps {
     stageNum: number;
 }
 
-export const Playscreen = ({ setGamestate, stageNum }: PlayscreenProps)=>{
+export const Playscreen = ({setGamestate, stageNum }: PlayscreenProps)=>{
     const canvasRef = useRef(null);
     const bulletRendererRef = useRef<BulletRendererRef>(null);
 
@@ -37,7 +37,7 @@ export const Playscreen = ({ setGamestate, stageNum }: PlayscreenProps)=>{
                     <pointLight position={[0, 0, 0]} />
                     <GyroCameraController/> //開発するときはctrl+/で消してもいい
                     <BulletRenderer ref={bulletRendererRef} />
-                    <Enemyrenderer stage={stageNum}/>
+                    <Enemyrenderer stage={stageNum} setGamestate={setGamestate}/>
                     <RigidBody colliders="cuboid" restitution={0}type="fixed"><Box /></RigidBody>
                     <Stars
                       radius={100} // 星の点滅(拡大)度合い

@@ -11,7 +11,7 @@ function App() {
 
   return (
     <>
-     {Gamestate=='title'&&<Title setGamestate={setGamestate}/>}
+     {Gamestate=='title'&&<Title setGamestate={setGamestate} setStageNum={setStageNum}/>}
      {Gamestate=='register'&&<Register setGamestate={setGamestate}/>}  
      {Gamestate=='play'&&<Playscreen setGamestate={setGamestate} stageNum={StageNum}/>}
      {Gamestate =='result'&&<Result setGamestate={setGamestate}/>}
