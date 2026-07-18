@@ -12,7 +12,7 @@ export interface EnemyInfo{
 }
 
 // 敵のモデルアセットを事前にプリロード（マウント時のガクつきを防止）
-useGLTF.preload('/src/gld/enemy_a.glb');
+useGLTF.preload('/gld/enemy_a.glb');
 
 /**
  * 敵キャラクターのアニメーションを再生・制御するカスタムフック（別定義の関数）
@@ -62,10 +62,10 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: () => vo
     const groupRef = useRef<any>(null);
 
     // プリロードされたモデルデータを取得
-    const normalGltf = useGLTF('/src/gld/enemy_a.glb');
+    const normalGltf = useGLTF('/gld/enemy_a.glb');
     
     // boss の場合は将来的に別のモデルに切り替えられるように定義（現在はデモとして同じモデルを使用）
-    const bossGltf = useGLTF('/src/gld/enemy_a.glb');
+    const bossGltf = useGLTF('/gld/enemy_a.glb');
 
     const handledefeate = (event: CollisionPayload)=>{
         // event や other が undefined の場合を考慮してオプショナルチェイニングを適用
