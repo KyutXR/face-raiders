@@ -343,6 +343,7 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
     return (
         <RigidBody
             ref={rigidBodyRef}
+            name={isBoss ? "boss" : "enemy"}
             colliders="ball"
             restitution={0.01}
             gravityScale={isdefeated ? 1 : 0}
