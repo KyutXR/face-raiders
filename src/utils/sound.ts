@@ -1,4 +1,4 @@
-// Web Audio API (SE用) および HTML5 Audio (BGM用) を用いた音声管理モジュール
+// Web Audio API (SE用) および HTML5 Audio (BGM用) を用いた統合サウンドコントロールモジュール
 
 type SoundStateListener = () => void;
 
@@ -11,13 +11,13 @@ class SoundManager {
     private bgmAudio: HTMLAudioElement | null = null;
     private currentBgmUrl: string | null = null;
 
-    // 音量・ミュート設定
-    private bgmVolume: number = 0.5; // 0.0 ~ 1.0
-    private seVolume: number = 0.7;  // 0.0 ~ 1.0
+    // 音量・ミュート設定 (0.0 ～ 1.0)
+    private bgmVolume: number = 0.5;
+    private seVolume: number = 0.7;
     private isBgmMuted: boolean = false;
     private isSeMuted: boolean = false;
 
-    // 状態変更リスナー
+    // 状態変更リスナー (React UI とのリアルタイム同期用)
     private listeners: Set<SoundStateListener> = new Set();
 
     constructor() {
@@ -25,7 +25,7 @@ class SoundManager {
     }
 
     /**
-     * Web Audio API (SE用) AudioContext の取得または初期化
+     * Web Audio API (SE用) AudioContext の取得およびサスペンド解除
      */
     public getAudioContext(): AudioContext {
         if (!this.audioCtx) {
@@ -39,7 +39,7 @@ class SoundManager {
     }
 
     /**
-     * 状態変更通知の購読 (React UI 用)
+     * 状態変更通知の購読 (React UI用)
      */
     public subscribe(listener: SoundStateListener): () => void {
         this.listeners.add(listener);
@@ -52,8 +52,76 @@ class SoundManager {
         this.listeners.forEach((listener) => listener());
     }
 
+    // ==========================================
+    // BGM（背景音楽）コントロールロジック
+    // ==========================================
+
     /**
-     * SE (効果音) ファイルをデコード・キャッシュする関数
+     * BGMの再生・停止・音量・ミュート状態を一括で即座に反映する統一メソッド
+     */
+    private updateBgmState() {
+        if (!this.bgmAudio) return;
+
+        // 音量とミュートプロパティの即時更新
+        this.bgmAudio.volume = this.bgmVolume;
+        this.bgmAudio.muted = this.isBgmMuted;
+
+        // ミュート中、または音量が 0 の場合は確実に再生停止 (pause)
+        if (this.isBgmMuted || this.bgmVolume === 0) {
+            this.bgmAudio.pause();
+        } else {
+            // ミュートが解除されており、音量が 0 超で、一時停止中の場合は再生開始
+            if (this.bgmAudio.paused && this.currentBgmUrl) {
+                this.bgmAudio.play().catch((err) => {
+                    console.warn('[SoundManager] BGM再生の開始がブロックされました（ユーザー操作が必要）:', err);
+                });
+            }
+        }
+    }
+
+    /**
+     * BGM のループ再生を開始
+     */
+    public playBGM(url: string = '/sounds/bgm.mp3') {
+        this.currentBgmUrl = url;
+
+        const targetSrcUrl = url.startsWith('http') ? url : window.location.origin + url;
+
+        // まだ BGM オーディオ要素がない、または異なる音源 URL の場合
+        if (!this.bgmAudio || this.bgmAudio.src !== targetSrcUrl) {
+            if (this.bgmAudio) {
+                this.bgmAudio.pause();
+            }
+            this.bgmAudio = new Audio(url);
+            this.bgmAudio.loop = true;
+        }
+
+        // BGM の最新状態を一括反映
+        this.updateBgmState();
+    }
+
+    /**
+     * BGM の停止
+     */
+    public stopBGM() {
+        if (this.bgmAudio) {
+            try {
+                this.bgmAudio.pause();
+                this.bgmAudio.currentTime = 0;
+            } catch (e) {
+                // エラーハンドリング
+            }
+            this.bgmAudio = null;
+        }
+        this.currentBgmUrl = null;
+    }
+
+    // ==========================================
+    // SE（効果音）再生ロジック (Web Audio API)
+    // ==========================================
+
+    /**
+     * SE ファイルをデコード・キャッシュする関数
      */
     public async loadSound(url: string): Promise<AudioBuffer | null> {
         if (this.bufferCache.has(url)) {
@@ -89,10 +157,10 @@ class SoundManager {
     }
 
     /**
-     * SE (効果音) の低遅延再生
+     * SE（効果音）の再生
      */
     public async playSound(url: string, baseVolume: number = 1.0) {
-        if (this.isSeMuted) return;
+        if (this.isSeMuted || this.seVolume === 0) return;
 
         try {
             const ctx = this.getAudioContext();
@@ -120,65 +188,9 @@ class SoundManager {
         }
     }
 
-    /**
-     * BGM のループ再生を開始 (HTML5 Audio を使用)
-     */
-    public async playBGM(url: string = '/sounds/bgm.mp3') {
-        if (this.isBgmMuted) {
-            this.currentBgmUrl = url;
-            return;
-        }
-
-        try {
-            // すでに同じURLのBGMインスタンスが存在する場合
-            if (this.bgmAudio && this.currentBgmUrl === url) {
-                this.bgmAudio.volume = this.bgmVolume;
-                this.bgmAudio.muted = false;
-                if (this.bgmAudio.paused) {
-                    await this.bgmAudio.play().catch((err) => {
-                        console.warn('[SoundManager] BGM自動再生がブロックされました:', err);
-                    });
-                }
-                return;
-            }
-
-            // 旧BGMの停止
-            this.stopBGM();
-
-            // 新しい HTMLAudioElement の作成
-            const audio = new Audio(url);
-            audio.loop = true;
-            audio.volume = this.bgmVolume;
-            audio.muted = this.isBgmMuted;
-
-            this.bgmAudio = audio;
-            this.currentBgmUrl = url;
-
-            await audio.play().catch((err) => {
-                console.warn('[SoundManager] BGM再生の開始が拒否されました（ユーザー操作が必要）:', err);
-            });
-        } catch (e) {
-            console.warn(`[SoundManager] BGM再生エラー (${url}):`, e);
-        }
-    }
-
-    /**
-     * BGM の停止・一時停止
-     */
-    public stopBGM() {
-        if (this.bgmAudio) {
-            try {
-                this.bgmAudio.pause();
-                this.bgmAudio.currentTime = 0;
-            } catch (e) {
-                // エラーハンドリング
-            }
-            this.bgmAudio = null;
-        }
-        this.currentBgmUrl = null;
-    }
-
-    // --- 音量・ミュート調整メソッド ---
+    // ==========================================
+    // ゲッター & セッター (音量・ミュート制御)
+    // ==========================================
 
     public getBgmVolume(): number { return this.bgmVolume; }
     public getSeVolume(): number { return this.seVolume; }
@@ -187,9 +199,7 @@ class SoundManager {
 
     public setBgmVolume(volume: number) {
         this.bgmVolume = Math.max(0, Math.min(1, volume));
-        if (this.bgmAudio) {
-            this.bgmAudio.volume = this.bgmVolume;
-        }
+        this.updateBgmState();
         this.notifyListeners();
     }
 
@@ -200,17 +210,7 @@ class SoundManager {
 
     public setBgmMuted(muted: boolean) {
         this.isBgmMuted = muted;
-        if (this.bgmAudio) {
-            this.bgmAudio.muted = muted;
-            if (muted) {
-                this.bgmAudio.pause();
-            } else {
-                this.bgmAudio.volume = this.bgmVolume;
-                this.bgmAudio.play().catch(() => {});
-            }
-        } else if (!muted && this.currentBgmUrl) {
-            this.playBGM(this.currentBgmUrl);
-        }
+        this.updateBgmState();
         this.notifyListeners();
     }
 
@@ -231,14 +231,14 @@ class SoundManager {
 // シングルトンインスタンス
 export const soundManager = new SoundManager();
 
-// 各種エクスポート関数
+// 便利関数のエクスポート
 export const playPlayerShootSound = () => soundManager.playSound('/sounds/shoot.mp3', 0.6);
 export const playEnemyDefeatSound = () => soundManager.playSound('/sounds/defeat.mp3', 0.8);
 export const playEnemyShootSound = () => soundManager.playSound('/sounds/enemy_shoot.mp3', 0.5);
 export const playBGM = (url: string = '/sounds/bgm.mp3') => soundManager.playBGM(url);
 export const stopBGM = () => soundManager.stopBGM();
 
-// SEのプリロード
+// SEのバックグラウンドプリロード
 soundManager.loadSound('/sounds/shoot.mp3');
 soundManager.loadSound('/sounds/defeat.mp3');
 soundManager.loadSound('/sounds/enemy_shoot.mp3');
