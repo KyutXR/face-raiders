@@ -1,21 +1,26 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { type EnemyInfo, Enemy } from "../objects/enemy";
+import { EnemyBullet, type EnemyBulletInfo } from "../objects/EnemyBullet";
 import { loadStageInfo } from "../../functions/Load";
 import type { GameResultData } from "../../functions/score";
+import type * as THREE from "three";
 
 interface Props {
     stage: number;
     setGamestate: (state: string) => void;
     setGameResult?: (updater: (prev: GameResultData) => GameResultData) => void;
+    onPlayerDamage?: (amount?: number) => void;
 }
 
-export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => {
+export const Enemyrenderer = ({ stage, setGamestate, setGameResult, onPlayerDamage }: Props) => {
     const stagedata = useMemo(() => loadStageInfo(stage), [stage]);
     
     // 現在のウェーブ番号
     const [currentWave, setCurrentWave] = useState(0);
     // 画面に表示する敵のリスト
     const [currentEnemies, setCurrentEnemies] = useState<EnemyInfo[]>([]);
+    // 画面に表示する敵弾のリスト
+    const [enemyBullets, setEnemyBullets] = useState<EnemyBulletInfo[]>([]);
 
     // 退場（撃破または消滅）した敵を追跡するSet
     const exitedSet = useRef<Set<EnemyInfo>>(new Set());
@@ -26,6 +31,7 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => 
     useEffect(() => {
         setCurrentWave(0);
         setCurrentEnemies([]);
+        setEnemyBullets([]);
         exitedSet.current.clear();
         targetDefeatCount.current = 0;
         if (waveTransitionTimeout.current) {
@@ -33,6 +39,21 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => 
             waveTransitionTimeout.current = null;
         }
     }, [stage]);
+
+    // 敵から弾が発射されたときのハンドラ
+    const handleShootBullet = (startPos: THREE.Vector3, direction: THREE.Vector3) => {
+        const newBullet: EnemyBulletInfo = {
+            id: Math.random().toString(36).substring(2, 9),
+            startPosition: startPos.clone(),
+            direction: direction.clone(),
+        };
+        setEnemyBullets((prev) => [...prev, newBullet]);
+    };
+
+    // 敵弾が消滅したときのハンドラ
+    const handleDestroyEnemyBullet = (id: string) => {
+        setEnemyBullets((prev) => prev.filter((b) => b.id !== id));
+    };
 
     // ウェーブクリアおよびステージクリアの判定処理
     const checkWaveClear = () => {
@@ -110,7 +131,7 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => 
         }
     }, [currentWave, stagedata]);
 
-    // 敵が撃破された時に呼び出されるコールバック
+    // 敵が自弾で撃破された時に呼び出されるコールバック
     const handleEnemyDefeat = (enemy: EnemyInfo) => {
         if (!exitedSet.current.has(enemy)) {
             exitedSet.current.add(enemy);
@@ -122,6 +143,18 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => 
                     return { ...prev, normalKills: prev.normalKills + 1 };
                 });
             }
+            checkWaveClear();
+        }
+    };
+
+    // 敵がプレイヤーに突進・激突した時に呼び出されるコールバック
+    const handleEnemyCollidePlayer = (enemy: EnemyInfo) => {
+        // プレイヤーにダメージを与える
+        onPlayerDamage?.(1);
+
+        // 倒したスコア（撃破数）は加算せず、退場扱いにしてウェーブクリア判定のみ行う
+        if (!exitedSet.current.has(enemy)) {
+            exitedSet.current.add(enemy);
             checkWaveClear();
         }
     };
@@ -138,7 +171,22 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => 
     return (
         <>
             {currentEnemies.map((enemy, index) => (
-                <Enemy key={index} info={enemy} onDefeat={handleEnemyDefeat} />
+                <Enemy 
+                    key={index} 
+                    info={enemy} 
+                    onDefeat={handleEnemyDefeat}
+                    onCollidePlayer={handleEnemyCollidePlayer}
+                    onShootBullet={handleShootBullet}
+                />
+            ))}
+
+            {enemyBullets.map((bullet) => (
+                <EnemyBullet
+                    key={bullet.id}
+                    info={bullet}
+                    onHitPlayer={() => onPlayerDamage?.(1)}
+                    onDestroy={handleDestroyEnemyBullet}
+                />
             ))}
         </>
     );
