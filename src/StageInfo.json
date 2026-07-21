@@ -48,7 +48,7 @@
           "LeaveTime": 13,
           "type": "normal",
           "position": [5, 4, 1],
-          "Movement": ["nori","tate","kaiten_up"]
+          "Movement": ["nori","rightup","kaiten_up"]
         }
       ],
       [
@@ -66,7 +66,7 @@
           "LeaveTime": 18,
           "type": "normal",
           "position": [10, -5, 7],
-          "Movement": ["yoko","tate"]
+          "Movement": ["yoko","rightup"]
         }
       ],
       [
@@ -75,7 +75,7 @@
           "LeaveTime": 13,
           "type": "normal",
           "position": [5, 4, 1],
-          "Movement": ["nori","tate","kaiten_up"]
+          "Movement": ["nori","rightup","kaiten_up"]
         }
       ],
       [
@@ -102,7 +102,7 @@
           "LeaveTime": 29,
           "type": "normal",
           "position": [5, 4, 1],
-          "Movement": ["nori","tate","kaiten_up"]
+          "Movement": ["nori","rightup","kaiten_up"]
         }
       ],
       [
@@ -111,7 +111,7 @@
           "LeaveTime": 32,
           "type": "normal",
           "position": [1, 1, -12],
-          "Movement": ["yoko","tate","kaiten_up","nori"]
+          "Movement": ["yoko","rightup","kaiten_up","nori"]
         }
       ],
       [
@@ -120,7 +120,7 @@
           "LeaveTime": 36,
           "type": "normal",
           "position": [5, 4, 1],
-          "Movement": ["nori","tate","kaiten_up"]
+          "Movement": ["nori","rightup","kaiten_up"]
         }
       ],
       [
@@ -129,7 +129,7 @@
           "LeaveTime": 40,
           "type": "normal",
           "position": [20, 1, -1],
-          "Movement": ["nori","tate","yoko"]
+          "Movement": ["nori","rightup","yoko"]
         }
       ],
       [
@@ -138,7 +138,7 @@
           "LeaveTime": 43,
           "type": "normal",
           "position": [5, 0, -3],
-          "Movement": ["tate"]
+          "Movement": ["rightup"]
         }
       ],
       [
@@ -183,7 +183,7 @@
           "LeaveTime": 60,
           "type": "normal",
           "position": [10, -3, 4],
-          "Movement": ["nori","tate"]
+          "Movement": ["nori","rightup"]
         }
       ],
       [
@@ -210,7 +210,7 @@
           "LeaveTime": 60,
           "type": "normal",
           "position": [-7, 6, -3],
-          "Movement": ["tate","kaiten_up"]
+          "Movement": ["rightdown","kaiten_up"]
         }
       ],
       [
@@ -237,7 +237,7 @@
           "LeaveTime": 78,
           "type": "normal",
           "position": [6, -8, -10],
-          "Movement": ["nori","tate","yoko"]
+          "Movement": ["nori","rightdown","yoko"]
         }
       ],
       [
@@ -246,7 +246,7 @@
           "LeaveTime": 87,
           "type": "normal",
           "position": [5, 0, 0],
-          "Movement": ["nori","tate"]
+          "Movement": ["nori","rightup"]
         }
       ],
       [
@@ -255,7 +255,7 @@
           "LeaveTime": 87,
           "type": "normal",
           "position": [0, 0, 0],
-          "Movement": ["nori","tate"]
+          "Movement": ["nori","rightdown"]
         }
       ],
       [
@@ -264,7 +264,7 @@
           "LeaveTime": 87,
           "type": "normal",
           "position": [-5, 0, 0],
-          "Movement": ["nori","tate"]
+          "Movement": ["nori","rightup"]
         }
       ],
       [
@@ -327,7 +327,7 @@
           "LeaveTime": 125,
           "type": "normal",
           "position": [0, -7, 3],
-          "Movement": ["nori","tate","kaiten_up","yoko"]
+          "Movement": ["nori","rightup","kaiten_up","yoko"]
         }
       ],
       [
@@ -354,7 +354,7 @@
           "LeaveTime": 155,
           "type": "normal",
           "position": [-7, -4, 5],
-          "Movement": ["nori","tate","yoko"]
+          "Movement": ["nori","rightdown","yoko"]
         }
       ],
       [
@@ -363,7 +363,7 @@
           "LeaveTime": 165,
           "type": "normal",
           "position": [5, 5, 5],
-          "Movement": ["nori","tate","kaiten_up","yoko"]
+          "Movement": ["nori","rightdown","kaiten_up","yoko"]
         }
       ],
       [
@@ -381,7 +381,7 @@
           "LeaveTime": 173,
           "type": "normal",
           "position": [5, -5, 5],
-          "Movement": ["tate","yoko","kaiten_up"]
+          "Movement": ["rightup","yoko","kaiten_up"]
         }
       ],
       [
@@ -390,7 +390,7 @@
           "LeaveTime": 178,
           "type": "normal",
           "position": [0, 0, 0],
-          "Movement": ["nori","right_up","kaiten_up","yoko"]
+          "Movement": ["nori","rightup","kaiten_up","yoko"]
         }
       ]
     ]
