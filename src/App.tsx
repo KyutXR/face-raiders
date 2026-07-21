@@ -13,10 +13,7 @@ function App() {
   const [imgUrl, _setImgUrl] = useState<string | null>(null);
 
   // リザルト表示用のゲーム結果データ（撃破数）
-  const [gameResult, setGameResult] = useState<GameResultData>({
-    normalKills: 12,
-    bossKills: 2,
-  });
+  const [gameResult, setGameResult] = useState<GameResultData>(INITIAL_GAME_RESULT);
 
   /**
    * スコア・撃破数・ゲーム状態を初期状態へリセットする関数

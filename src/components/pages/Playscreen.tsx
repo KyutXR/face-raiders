@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Box } from "../objects/box";
 import { OrbitControls, Stars, Text } from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
@@ -10,18 +10,24 @@ import type { BulletRendererRef } from "../renderers/BulletRenderer";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { Enemy1 } from "../objects/Enemy1";
 import { Enemyrenderer } from "../renderers/EnemyRenderer";
-import type { GameResultData } from "../../functions/score";
+import { INITIAL_GAME_RESULT, type GameResultData } from "../../functions/score";
 
 interface PlayscreenProps {
     setGamestate: (state: string) => void;
-    setGameResult?: (result: GameResultData) => void;
+    setGameResult?: (result: GameResultData | ((prev: GameResultData) => GameResultData)) => void;
     stageNum: number;
     imgUrl?: string | null;
 }
 
-export const Playscreen = ({ setGamestate, stageNum, imgUrl }: PlayscreenProps) => {
+export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: PlayscreenProps) => {
     const canvasRef = useRef(null);
     const bulletRendererRef = useRef<BulletRendererRef>(null);
+
+    useEffect(() => {
+        if (setGameResult) {
+            setGameResult(INITIAL_GAME_RESULT);
+        }
+    }, [setGameResult]);
 
     const onCanvasClick = () => {
         bulletRendererRef.current?.shoot(); // 画面クリックで弾を発射する
@@ -53,7 +59,7 @@ export const Playscreen = ({ setGamestate, stageNum, imgUrl }: PlayscreenProps) 
                         <pointLight position={[0, 0, 0]} />
                         <GyroCameraController /> //開発するときはctrl+/で消してもいい
                         <BulletRenderer ref={bulletRendererRef} />
-                        <Enemyrenderer stage={stageNum} setGamestate={setGamestate} />
+                        <Enemyrenderer stage={stageNum} setGamestate={setGamestate} setGameResult={setGameResult} />
                         <Enemy1 position={[0, 0, -3]} />
                         <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody>
                         <Stars

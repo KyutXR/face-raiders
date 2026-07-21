@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { type EnemyInfo, Enemy } from "../objects/enemy";
 import { loadStageInfo } from "../../functions/Load";
+import type { GameResultData } from "../../functions/score";
 
 interface Props {
     stage: number;
     setGamestate: (state: string) => void;
+    setGameResult?: (updater: (prev: GameResultData) => GameResultData) => void;
 }
 
-export const Enemyrenderer = ({ stage, setGamestate }: Props) => {
+export const Enemyrenderer = ({ stage, setGamestate, setGameResult }: Props) => {
     const stagedata = useMemo(() => loadStageInfo(stage), [stage]);
     
     // 現在のウェーブ番号
@@ -112,6 +114,14 @@ export const Enemyrenderer = ({ stage, setGamestate }: Props) => {
     const handleEnemyDefeat = (enemy: EnemyInfo) => {
         if (!exitedSet.current.has(enemy)) {
             exitedSet.current.add(enemy);
+            if (setGameResult) {
+                setGameResult((prev) => {
+                    if (enemy.type === "boss") {
+                        return { ...prev, bossKills: prev.bossKills + 1 };
+                    }
+                    return { ...prev, normalKills: prev.normalKills + 1 };
+                });
+            }
             checkWaveClear();
         }
     };
