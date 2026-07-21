@@ -8,10 +8,13 @@ import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionG
 import { BulletRenderer } from "../renderers/BulletRenderer";
 import type { BulletRendererRef } from "../renderers/BulletRenderer";
 import { Physics, RigidBody } from "@react-three/rapier";
+import { Enemy1 } from "../objects/Enemy1";
 import { Enemyrenderer } from "../renderers/EnemyRenderer";
+import type { GameResultData } from "../../functions/score";
 
 interface PlayscreenProps {
     setGamestate: (state: string) => void;
+    setGameResult?: (result: GameResultData) => void;
     stageNum: number;
     imgUrl?: string | null;
 }
@@ -51,6 +54,7 @@ export const Playscreen = ({ setGamestate, stageNum, imgUrl }: PlayscreenProps) 
                         <GyroCameraController /> //開発するときはctrl+/で消してもいい
                         <BulletRenderer ref={bulletRendererRef} />
                         <Enemyrenderer stage={stageNum} setGamestate={setGamestate} />
+                        <Enemy1 position={[0, 0, -3]} />
                         <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody>
                         <Stars
                             radius={100} // 星の点滅(拡大)度合い
