@@ -203,11 +203,11 @@ export const useEnemyAnimation = (
 interface EnemyProps {
     info: EnemyInfo;
     onDefeat?: (enemy: EnemyInfo) => void;
+    onCollidePlayer?: (enemy: EnemyInfo) => void;
     onShootBullet?: (startPos: THREE.Vector3, direction: THREE.Vector3) => void;
-    onHitPlayer?: () => void;
 }
 
-export const Enemy = ({ info, onDefeat, onShootBullet, onHitPlayer }: EnemyProps)=>{
+export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyProps)=>{
 
     const [isdefeated,setIsDefeated] = useState(false);
     const groupRef = useRef<any>(null);
@@ -259,14 +259,13 @@ export const Enemy = ({ info, onDefeat, onShootBullet, onHitPlayer }: EnemyProps
                 const enemyPos = new THREE.Vector3(translation.x, translation.y, translation.z);
                 const camPos = camera.position;
 
-                // 2. カメラとの衝突判定 (距離が0.8以内になったらプレイヤーに衝突して撃破)
+                // 2. カメラとの衝突判定 (距離が0.8以内になったらプレイヤーに衝突して退場)
                 const distance = enemyPos.distanceTo(camPos);
                 if (distance <= 0.8) {
                     setTimeout(() => {
                         if (!isdefeated) {
                             setIsDefeated(true);
-                            onHitPlayer?.();
-                            onDefeat?.(info);
+                            onCollidePlayer?.(info);
                         }
                     }, 0);
                     return;
@@ -290,8 +289,13 @@ export const Enemy = ({ info, onDefeat, onShootBullet, onHitPlayer }: EnemyProps
                     const currentTime = clock.getElapsedTime();
                     if (currentTime - lastShootTime.current >= shootInterval) {
                         lastShootTime.current = currentTime;
-                        const shootDir = new THREE.Vector3().subVectors(camPos, enemyPos).normalize();
-                        onShootBullet(enemyPos, shootDir);
+                        
+                        // 敵の頭・顔の高さからカメラ（視界中心）へ向けて発射
+                        const startBulletPos = enemyPos.clone().add(new THREE.Vector3(0, 0.2, 0.2));
+                        const targetPos = camPos.clone();
+                        const shootDir = new THREE.Vector3().subVectors(targetPos, startBulletPos).normalize();
+                        
+                        onShootBullet(startBulletPos, shootDir);
                     }
                 }
             } catch (e) {

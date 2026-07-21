@@ -40,7 +40,7 @@ export const EnemyBullet = ({ info, onHitPlayer, onDestroy }: EnemyBulletProps) 
         }
     }, [info.direction, speed]);
 
-    // 毎フレームの判定 (寿命管理およびカメラ距離判定)
+    // 毎フレームの判定 (寿命管理、速度維持、およびカメラ距離判定)
     useFrame(({ camera }, delta) => {
         if (!active || isHit) return;
 
@@ -51,14 +51,24 @@ export const EnemyBullet = ({ info, onHitPlayer, onDestroy }: EnemyBulletProps) 
             return;
         }
 
-        // カメラ（プレイヤー）との接触判定 (距離が0.6以内)
         if (rigidBodyRef.current) {
             try {
+                // 弾の初速度が打ち消されないよう確実に維持
+                rigidBodyRef.current.setLinvel(
+                    {
+                        x: info.direction.x * speed,
+                        y: info.direction.y * speed,
+                        z: info.direction.z * speed,
+                    },
+                    true
+                );
+
+                // カメラ（プレイヤー）との接触判定 (距離が1.2以内)
                 const translation = rigidBodyRef.current.translation();
                 const bulletPos = new Vector3(translation.x, translation.y, translation.z);
                 const distance = bulletPos.distanceTo(camera.position);
 
-                if (distance <= 0.6) {
+                if (distance <= 1.2) {
                     setIsHit(true);
                     onHitPlayer();
                     setTimeout(() => {
@@ -108,6 +118,8 @@ export const EnemyBullet = ({ info, onHitPlayer, onDestroy }: EnemyBulletProps) 
                 colliders="ball"
                 restitution={0}
                 gravityScale={0}
+                lockRotations={true}
+                ccd={true}
                 onCollisionEnter={handleCollision}
                 position={info.startPosition}
             >

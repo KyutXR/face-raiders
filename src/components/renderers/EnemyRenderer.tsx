@@ -131,7 +131,7 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult, onPlayerDama
         }
     }, [currentWave, stagedata]);
 
-    // 敵が撃破された時に呼び出されるコールバック
+    // 敵が自弾で撃破された時に呼び出されるコールバック
     const handleEnemyDefeat = (enemy: EnemyInfo) => {
         if (!exitedSet.current.has(enemy)) {
             exitedSet.current.add(enemy);
@@ -143,6 +143,18 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult, onPlayerDama
                     return { ...prev, normalKills: prev.normalKills + 1 };
                 });
             }
+            checkWaveClear();
+        }
+    };
+
+    // 敵がプレイヤーに突進・激突した時に呼び出されるコールバック
+    const handleEnemyCollidePlayer = (enemy: EnemyInfo) => {
+        // プレイヤーにダメージを与える
+        onPlayerDamage?.(1);
+
+        // 倒したスコア（撃破数）は加算せず、退場扱いにしてウェーブクリア判定のみ行う
+        if (!exitedSet.current.has(enemy)) {
+            exitedSet.current.add(enemy);
             checkWaveClear();
         }
     };
@@ -163,8 +175,8 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult, onPlayerDama
                     key={index} 
                     info={enemy} 
                     onDefeat={handleEnemyDefeat}
+                    onCollidePlayer={handleEnemyCollidePlayer}
                     onShootBullet={handleShootBullet}
-                    onHitPlayer={() => onPlayerDamage?.(1)}
                 />
             ))}
 
