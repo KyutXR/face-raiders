@@ -250,8 +250,9 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
     const rushSpeed = 5; // 突進スピード（秒速5ユニット）
 
     // 弾発射タイマー
-    const lastShootTime = useRef(0);
+    const lastShootTime = useRef<number | null>(null);
     const isBoss = info.type === 'boss';
+    const initialShootDelay = 2.0; // 出現後、最初の弾を発射するまでのディレイ（2秒）
     const shootInterval = isBoss ? 2.0 : 3.5; // ボスは2秒毎、通常敵は3.5秒毎に発射
 
     const handledefeate = (event: CollisionPayload)=>{
@@ -313,7 +314,10 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
                 // 4. 定期的な敵弾の発射処理
                 if (onShootBullet) {
                     const currentTime = clock.getElapsedTime();
-                    if (currentTime - lastShootTime.current >= shootInterval) {
+                    if (lastShootTime.current === null) {
+                        // 出現時の現在時刻を基準にし、initialShootDelay後に初弾を発射できるよう初期化
+                        lastShootTime.current = currentTime - (shootInterval - initialShootDelay);
+                    } else if (currentTime - lastShootTime.current >= shootInterval) {
                         lastShootTime.current = currentTime;
                         
                         // 敵の頭・顔の高さからカメラ（視界中心）へ向けて発射
