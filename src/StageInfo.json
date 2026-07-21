@@ -165,7 +165,7 @@
           "LeaveTime": 55,
           "type": "normal",
           "position": [-5, -4, 1],
-          "Movement": ["tate","kaiten_up"]
+          "Movement": ["rightup","kaiten_up"]
         }
       ],
       [
