@@ -11,6 +11,10 @@ import { Physics, RigidBody } from "@react-three/rapier";
 import { Enemy1 } from "../objects/Enemy1";
 import { Enemyrenderer } from "../renderers/EnemyRenderer";
 import { INITIAL_GAME_RESULT, type GameResultData } from "../../functions/score";
+import { EnemyDirectionOverlay } from "../ui/EnemyDirectionOverlay";
+import type { OffScreenIndicatorData } from "../ui/EnemyDirectionOverlay";
+import { OffScreenIndicatorTracker } from "../renderers/OffScreenIndicatorTracker";
+import { enemyRegistry } from "../../functions/enemyRegistry";
 
 interface PlayscreenProps {
     setGamestate: (state: string) => void;
@@ -27,12 +31,16 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: Pl
 
     const [playerHp, setPlayerHp] = useState(MAX_HP);
     const [isDamageFlashing, setIsDamageFlashing] = useState(false);
+    const [offScreenIndicators, setOffScreenIndicators] = useState<OffScreenIndicatorData[]>([]);
     const isGameOverRef = useRef(false);
 
     useEffect(() => {
         if (setGameResult) {
             setGameResult(INITIAL_GAME_RESULT);
         }
+        return () => {
+            enemyRegistry.clear();
+        };
     }, [setGameResult]);
 
     // プレイヤーがダメージを受けた時のハンドラ
@@ -150,6 +158,9 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: Pl
                     </div>
                 </div>
 
+                {/* 画面外敵方向矢印オーバーレイ */}
+                <EnemyDirectionOverlay indicators={offScreenIndicators} />
+
                 <Canvas
                     ref={canvasRef}
                     shadows={'soft'}
@@ -167,6 +178,7 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: Pl
                             setGameResult={setGameResult}
                             onPlayerDamage={handlePlayerDamage}
                         />
+                        <OffScreenIndicatorTracker onUpdateIndicators={setOffScreenIndicators} />
                         <Enemy1 position={[0, 0, -3]} />
                         <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody>
                         <Stars
