@@ -57,6 +57,10 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
             console.error("Error updating bullet physics on collision:", e);
           }
         }
+        // スコア表示・火花エフェクト表示後に自動的に消去
+        setTimeout(() => {
+          setActive(false);
+        }, 500);
       }, 0);
     }
   };

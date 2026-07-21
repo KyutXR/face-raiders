@@ -200,7 +200,14 @@ export const useEnemyAnimation = (
     return { actions, names, currentIndex };
 };
 
-export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: EnemyInfo) => void })=>{
+interface EnemyProps {
+    info: EnemyInfo;
+    onDefeat?: (enemy: EnemyInfo) => void;
+    onShootBullet?: (startPos: THREE.Vector3, direction: THREE.Vector3) => void;
+    onHitPlayer?: () => void;
+}
+
+export const Enemy = ({ info, onDefeat, onShootBullet, onHitPlayer }: EnemyProps)=>{
 
     const [isdefeated,setIsDefeated] = useState(false);
     const groupRef = useRef<any>(null);
@@ -216,6 +223,11 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
     const isRushing = info.Movement.includes("rush") && !isdefeated;
     const rushSpeed = 5; // 突進スピード（秒速5ユニット）
 
+    // 弾発射タイマー
+    const lastShootTime = useRef(0);
+    const isBoss = info.type === 'boss';
+    const shootInterval = isBoss ? 2.0 : 3.5; // ボスは2秒毎、通常敵は3.5秒毎に発射
+
     const handledefeate = (event: CollisionPayload)=>{
         if (event?.other?.rigidBodyObject?.name === 'bullet') {
             if (!isdefeated) {
@@ -227,7 +239,6 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
         }
     } 
 
-    const isBoss = info.type === 'boss';
     const selectedGltf = isBoss ? bossGltf : normalGltf;
     const scaleFactor = isBoss ? 2.5 : 1.0;
 
@@ -237,8 +248,8 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
 
     useEnemyAnimation(clonedAnimations, groupRef, isdefeated, info.Movement, isRushing);
 
-    // 毎フレームのループ処理（カメラ追従、突進移動、カメラ衝突判定）
-    useFrame(({ camera }) => {
+    // 毎フレームのループ処理（カメラ追従、突進移動、カメラ衝突判定、弾発射）
+    useFrame(({ camera, clock }) => {
         if (isdefeated) return;
 
         if (rigidBodyRef.current) {
@@ -248,12 +259,15 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
                 const enemyPos = new THREE.Vector3(translation.x, translation.y, translation.z);
                 const camPos = camera.position;
 
-                // 2. カメラとの衝突判定 (距離が0.5以内になったら衝突)
+                // 2. カメラとの衝突判定 (距離が0.8以内になったらプレイヤーに衝突して撃破)
                 const distance = enemyPos.distanceTo(camPos);
-                if (distance <= 0.5) {
+                if (distance <= 0.8) {
                     setTimeout(() => {
-                        setIsDefeated(true);
-                        onDefeat?.(info);
+                        if (!isdefeated) {
+                            setIsDefeated(true);
+                            onHitPlayer?.();
+                            onDefeat?.(info);
+                        }
                     }, 0);
                     return;
                 }
@@ -270,12 +284,22 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
                         true
                     );
                 }
+
+                // 4. 定期的な敵弾の発射処理
+                if (onShootBullet) {
+                    const currentTime = clock.getElapsedTime();
+                    if (currentTime - lastShootTime.current >= shootInterval) {
+                        lastShootTime.current = currentTime;
+                        const shootDir = new THREE.Vector3().subVectors(camPos, enemyPos).normalize();
+                        onShootBullet(enemyPos, shootDir);
+                    }
+                }
             } catch (e) {
                 console.error("Error during enemy physics/collision updates:", e);
             }
         }
 
-        // 4. カメラの方向へ顔を向ける
+        // 5. カメラの方向へ顔を向ける
         if (groupRef.current && camera) {
             try {
                 groupRef.current.updateMatrixWorld(true);
