@@ -6,7 +6,7 @@ import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
 
-export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => void })=>{
+export const Playscreen = ({ setGamestate, imgUrl }: { setGamestate: (state: string) => void, imgUrl?: string | null })=>{
     const canvasRef = useRef(null);
 
     const onCanvasClick = ()=>{
@@ -15,7 +15,19 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
 
     return (
         <DeviceOrientationPermissionGate>
-            <div id="CanvasContainer">
+            <div id="CanvasContainer"style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+
+                {imgUrl && (
+                    <img 
+                        src={imgUrl} 
+                        style={{ 
+                            position: 'absolute', top: '20px', left: '20px', // 左上に固定
+                            width: '60px', height: '60px', borderRadius: '50%', // サイズと丸み
+                            zIndex: 100 // 3Dキャンバスより手前に表示させる
+                        }} 
+                    />
+                )}
+
                   <Canvas 
                     ref = {canvasRef}
                     shadows={'soft'}

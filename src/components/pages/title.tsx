@@ -27,7 +27,7 @@ export const Title = ({ setGamestate }: { setGamestate: (state: string) => void 
 
   return (
     <TitleWrapper>
-      <Button onClick={() => setGamestate("register")}>
+      <Button onClick={() => setGamestate("photo")}>
         <Logo src="/logo.svg" alt="logo" />
       </Button>
     </TitleWrapper>
