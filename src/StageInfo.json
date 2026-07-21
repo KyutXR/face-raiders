@@ -37,5 +37,104 @@
         }
       ]
     ]
+  },
+  "3": {
+    "waves": 1,
+    "LimitTime": 120,
+    "enemies": [
+      [
+        {
+          "EmergeTime": 1,
+          "LeaveTime": 13,
+          "type": "normal",
+          "position": [3, 2, -10],
+          "Movement": ["nori","tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 2,
+          "LeaveTime": 12,
+          "type": "boss",
+          "position": [0, 5, -15],
+          "Movement": ["yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 3,
+          "LeaveTime": 15,
+          "type": "normal",
+          "position": [1, 1, -12],
+          "Movement": ["yoko"]
+        }
+      ]
+    ]
+  },
+  "4": {
+    "waves": 1,
+    "LimitTime": 120,
+    "enemies": [
+      [
+        {
+          "EmergeTime": 1,
+          "LeaveTime": 13,
+          "type": "normal",
+          "position": [3, 2, -10],
+          "Movement": ["nori","tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 2,
+          "LeaveTime": 12,
+          "type": "boss",
+          "position": [0, 5, -15],
+          "Movement": ["yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 3,
+          "LeaveTime": 15,
+          "type": "normal",
+          "position": [1, 1, -12],
+          "Movement": ["yoko"]
+        }
+      ]
+    ]
+  },
+  "5": {
+    "waves": 1,
+    "LimitTime": 120,
+    "enemies": [
+      [
+        {
+          "EmergeTime": 1,
+          "LeaveTime": 13,
+          "type": "normal",
+          "position": [3, 2, -10],
+          "Movement": ["nori","tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 2,
+          "LeaveTime": 12,
+          "type": "boss",
+          "position": [0, 5, -15],
+          "Movement": ["yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 3,
+          "LeaveTime": 15,
+          "type": "normal",
+          "position": [1, 1, -12],
+          "Movement": ["yoko"]
+        }
+      ]
+    ]
   }
 }

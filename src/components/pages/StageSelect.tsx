@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { faceDataStore } from '../../functions/faceDatastore';
+import { getAvailableStages } from '../../functions/Load';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(15px); }
@@ -64,20 +66,37 @@ const RegisteredText = styled.span`
 `;
 
 const CardContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
   width: 90%;
-  max-width: 720px;
-  justify-content: center;
-  flex-wrap: wrap;
+  max-width: 960px;
+  max-height: 65vh;
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
   animation: ${fadeIn} 0.5s ease-out;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(18, 25, 41, 0.4);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.6);
+  }
 `;
 
 const StageCard = styled.div<{ $color: string }>`
   position: relative;
-  flex: 1;
-  min-width: 260px;
-  max-width: 320px;
+  box-sizing: border-box;
+  width: 100%;
   background: rgba(18, 25, 41, 0.8);
   backdrop-filter: blur(16px);
   border: 2px solid ${(props) => props.$color};
@@ -86,7 +105,8 @@ const StageCard = styled.div<{ $color: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 20px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
@@ -97,35 +117,18 @@ const StageCard = styled.div<{ $color: string }>`
   }
 `;
 
-const StageBadge = styled.span<{ $bgColor: string }>`
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background-color: ${(props) => props.$bgColor};
-  color: #000;
-`;
-
-const StageName = styled.h3`
+const StageTitle = styled.h3<{ $color: string }>`
   margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 1px;
-`;
-
-const StageDescription = styled.p`
-  margin: 0;
-  font-size: 14px;
-  color: #a0aec0;
-  text-align: center;
-  line-height: 1.5;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: ${(props) => props.$color};
+  text-shadow: 0 2px 10px ${(props) => `${props.$color}44`};
 `;
 
 const SelectButton = styled.button<{ $bgColor: string }>`
   width: 100%;
   padding: 12px 0;
-  margin-top: 8px;
   font-size: 16px;
   font-weight: 700;
   background: ${(props) => props.$bgColor};
@@ -163,8 +166,17 @@ interface StageSelectProps {
   setStageNum: (num: number) => void;
 }
 
+const STAGE_THEME_COLORS = [
+  { main: '#00ffff', bg: 'linear-gradient(135deg, #00ffff 0%, #00bfff 100%)' },
+  { main: '#ff007f', bg: 'linear-gradient(135deg, #ff007f 0%, #ff5500 100%)' },
+  { main: '#00ff88', bg: 'linear-gradient(135deg, #00ff88 0%, #00b359 100%)' },
+  { main: '#ffaa00', bg: 'linear-gradient(135deg, #ffaa00 0%, #ff7700 100%)' },
+  { main: '#a855f7', bg: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)' },
+];
+
 export const StageSelect = ({ setGamestate, setStageNum }: StageSelectProps) => {
   const croppedFaceUrl = faceDataStore.croppedFaceUrl;
+  const stages = useMemo(() => getAvailableStages(), []);
 
   const handleSelectStage = (stageNum: number) => {
     setStageNum(stageNum);
@@ -183,27 +195,22 @@ export const StageSelect = ({ setGamestate, setStageNum }: StageSelectProps) => 
       )}
 
       <CardContainer>
-        <StageCard $color="#00ffff" onClick={() => handleSelectStage(1)}>
-          <StageBadge $bgColor="#00ffff">STAGE 1</StageBadge>
-          <StageName>STANDARD</StageName>
-          <StageDescription>
-            基本のゲームモード。敵の攻撃を見極めて撃破しよう！
-          </StageDescription>
-          <SelectButton $bgColor="linear-gradient(135deg, #00ffff 0%, #00bfff 100%)">
-            PLAY STAGE 1 ➔
-          </SelectButton>
-        </StageCard>
+        {stages.map((stage, index) => {
+          const theme = STAGE_THEME_COLORS[index % STAGE_THEME_COLORS.length];
 
-        <StageCard $color="#ff007f" onClick={() => handleSelectStage(2)}>
-          <StageBadge $bgColor="#ff007f">STAGE 2</StageBadge>
-          <StageName>HARD</StageName>
-          <StageDescription>
-            高難易度モード。スピードと正確なエイムが試される！
-          </StageDescription>
-          <SelectButton $bgColor="linear-gradient(135deg, #ff007f 0%, #ff5500 100%)">
-            PLAY STAGE 2 ➔
-          </SelectButton>
-        </StageCard>
+          return (
+            <StageCard
+              key={stage.stageNum}
+              $color={theme.main}
+              onClick={() => handleSelectStage(stage.stageNum)}
+            >
+              <StageTitle $color={theme.main}>STAGE {stage.stageNum}</StageTitle>
+              <SelectButton $bgColor={theme.bg}>
+                PLAY STAGE {stage.stageNum} ➔
+              </SelectButton>
+            </StageCard>
+          );
+        })}
       </CardContainer>
 
       <BackButton onClick={() => setGamestate('register')}>
@@ -212,3 +219,5 @@ export const StageSelect = ({ setGamestate, setStageNum }: StageSelectProps) => 
     </Container>
   );
 };
+
+
