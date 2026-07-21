@@ -320,8 +320,8 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
               <PrimaryButton onClick={handleCrop}>
                 ✂️ 顔を切り取る
               </PrimaryButton>
-              <SuccessButton onClick={() => setGamestate('play')}>
-                🎮 ゲーム開始 ➔
+              <SuccessButton onClick={() => setGamestate('stageSelect')}>
+                🎯 ステージ選択へ ➔
               </SuccessButton>
             </ButtonGroup>
 

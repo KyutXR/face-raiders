@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import { Title } from './components/pages/title';
 import { Register } from './components/pages/register';
+import { StageSelect } from './components/pages/StageSelect';
 import { Result } from './components/pages/result';
 import { Playscreen } from './components/pages/Playscreen';
 import { INITIAL_GAME_RESULT } from './functions/score';
@@ -40,8 +41,9 @@ function App() {
 
   return (
     <>
-      {Gamestate === 'title' && <Title setGamestate={setGamestate} setStageNum={setStageNum} />}
+      {Gamestate === 'title' && <Title setGamestate={setGamestate} />}
       {Gamestate === 'register' && <Register setGamestate={setGamestate} />}
+      {Gamestate === 'stageSelect' && <StageSelect setGamestate={setGamestate} setStageNum={setStageNum} />}
       {Gamestate === 'play' && (
         <Playscreen
           setGamestate={setGamestate}
