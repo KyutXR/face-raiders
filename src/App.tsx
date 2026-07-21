@@ -4,22 +4,66 @@ import { Title } from './components/pages/title';
 import { Register } from './components/pages/register';
 import { Result } from './components/pages/result';
 import { Playscreen } from './components/pages/Playscreen';
-import { Photo } from './components/pages/photo';
+import { INITIAL_GAME_RESULT } from './functions/score';
+import type { GameResultData } from './functions/score';
 
 function App() {
-  const [Gamestate, setGamestate] = useState('title')
+  const [Gamestate, setGamestate] = useState('title');
   const [StageNum, setStageNum] = useState(1)
-  const [imgUrl, setImgUrl] = useState<string | null>(null)
+  const [imgUrl, _setImgUrl] = useState<string | null>(null);
+
+  // リザルト表示用のゲーム結果データ（撃破数）
+  const [gameResult, setGameResult] = useState<GameResultData>({
+    normalKills: 12,
+    bossKills: 2,
+  });
+
+  /**
+   * スコア・撃破数・ゲーム状態を初期状態へリセットする関数
+   */
+  const resetGameState = () => {
+    setGameResult(INITIAL_GAME_RESULT);
+  };
+
+  /**
+   * 「タイトルへ」戻る処理（ゲーム状態をリセットしてタイトル画面へ遷移）
+   */
+  const handleGoTitle = () => {
+    resetGameState();
+    setGamestate('title');
+  };
+
+  /**
+   * 「もう一度プレイ」処理（ゲーム状態をリセットしてプレイ/登録画面へ遷移）
+   */
+  const handleRetry = () => {
+    resetGameState();
+    setGamestate('register');
+  };
 
   return (
     <>
-      {Gamestate == 'title' && <Title setGamestate={setGamestate} setStageNum={setStageNum} />}
-      {Gamestate == 'register' && <Register setGamestate={setGamestate} />}
-      {Gamestate == 'play' && <Playscreen setGamestate={setGamestate} stageNum={StageNum} imgUrl={imgUrl} />}
-      {Gamestate == 'result' && <Result setGamestate={setGamestate} />}
-      {Gamestate == 'photo' && <Photo setGamestate={setGamestate} onPhotoCropped={setImgUrl} />}
+      {Gamestate === 'title' && <Title setGamestate={setGamestate} setStageNum={setStageNum} />}
+      {Gamestate === 'register' && <Register setGamestate={setGamestate} />}
+      {Gamestate === 'play' && (
+        <Playscreen
+          setGamestate={setGamestate}
+          setGameResult={setGameResult}
+          stageNum={StageNum}
+          imgUrl={imgUrl}
+        />
+      )}
+      {Gamestate === 'result' && (
+        <Result
+          setGamestate={setGamestate}
+          gameResult={gameResult}
+          onRetry={handleRetry}
+          onGoTitle={handleGoTitle}
+          onReset={resetGameState}
+        />
+      )}
     </>
-  )
+  );
 }
 
 export default App
