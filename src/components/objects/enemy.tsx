@@ -22,62 +22,69 @@ useGLTF.preload('/gld/enemy_a.glb');
  * 敵の頭部ボーンおよびモデルの動きに対して lerp(線形補間) で追従し、
  * デモ動作として口をパクパク開閉させるアニメーション動作を実行します。
  */
-export const EnemyFaceMesh = ({ scene }: { scene?: THREE.Group }) => {
+// ターゲットノード（Cube / Head / Face / 最初のMesh）を安全に検索するヘルパー関数
+const findTargetNode = (group: THREE.Object3D): THREE.Object3D | null => {
+    let result: THREE.Object3D | null = null;
+    group.traverse((child: THREE.Object3D) => {
+        if (result) return;
+        const lower = child.name.toLowerCase();
+        if (lower.includes("cube") || lower.includes("head") || lower.includes("face") || lower.includes("body")) {
+            result = child;
+        }
+    });
+    if (!result) {
+        group.traverse((child: THREE.Object3D) => {
+            if (result) return;
+            if ((child as THREE.Mesh).isMesh) {
+                result = child;
+            }
+        });
+    }
+    return result;
+};
+
+export const EnemyFaceMesh = ({ scene, groupRef }: { scene?: THREE.Group; groupRef?: React.RefObject<THREE.Group | null> }) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const [faceTexture, setFaceTexture] = useState<THREE.Texture | null>(faceDataStore.croppedFaceTexture);
 
-    // モデル内の頭部・顔ボーンの参照を保持
-    const headBoneRef = useRef<THREE.Object3D | null>(null);
+    // アタッチ済みの親ノードの参照を保持
+    const attachedParentRef = useRef<THREE.Object3D | null>(null);
 
-    useEffect(() => {
-        if (scene) {
-            scene.traverse((child) => {
-                const lower = child.name.toLowerCase();
-                if (lower.includes("head") || lower.includes("face")) {
-                    headBoneRef.current = child;
-                }
-            });
-        }
-    }, [scene]);
-
-    // 毎フレームの補間追従処理 (lerp) & 口パクパクデモアニメーション
-    useFrame((state, delta) => {
+    // 毎フレームの更新 & 口パクパクデモアニメーション
+    useFrame((state) => {
         if (faceDataStore.croppedFaceTexture && faceTexture !== faceDataStore.croppedFaceTexture) {
             setFaceTexture(faceDataStore.croppedFaceTexture);
         }
 
         if (!meshRef.current) return;
 
-        // 1. 理想的な顔の相対位置
-        const targetPos = new THREE.Vector3(0, 0.1, 0.45);
+        // まだアニメーションノードにアタッチされていない場合、検索して親ノードの直下に子オブジェクトとして追加
+        const targetGroup = groupRef?.current || scene;
+        if (!attachedParentRef.current && targetGroup) {
+            const targetNode = findTargetNode(targetGroup);
 
-        // 頭部ボーンが存在する場合は、そのボーンの位置にオフセットを加算
-        if (headBoneRef.current) {
-            const bonePos = new THREE.Vector3();
-            headBoneRef.current.getWorldPosition(bonePos);
-            if (meshRef.current.parent) {
-                meshRef.current.parent.worldToLocal(bonePos);
-                targetPos.copy(bonePos).add(new THREE.Vector3(0, 0, 0.15));
+            // 見つかったノードの直接の子オブジェクトとして顔メッシュを追加
+            if (targetNode && meshRef.current) {
+                attachedParentRef.current = targetNode;
+                targetNode.add(meshRef.current);
+                // モデル（Cube等）の正面ローカル位置にセット
+                meshRef.current.position.set(0, 0, 0.46);
+                meshRef.current.rotation.set(0, 0, 0);
             }
         }
 
-        // 緩やかに吸い付くように線形補間 (lerp) 追従
-        const lerpFactor = Math.min(1, delta * 12);
-        meshRef.current.position.lerp(targetPos, lerpFactor);
-
-        // 2. ★ メッシュが適用されていることを視認できる口パクパク動作デモ
-        // 時間経過 (state.clock.elapsedTime) に合わせて、縦方向(Y軸)のスケールを 1.0 〜 1.25 の間でパクパク開閉伸縮
+        // 口パクパク動作デモ（メッシュのローカルスケールを変更）
         const mouthMouthOpen = Math.abs(Math.sin(state.clock.elapsedTime * 8));
         meshRef.current.scale.y = 1.0 + mouthMouthOpen * 0.22;
-        meshRef.current.scale.x = 1.0 - mouthMouthOpen * 0.05; // 縦に開くときに少し横を絞るリアリティ
+        meshRef.current.scale.x = 1.0 - mouthMouthOpen * 0.05;
     });
 
     if (!faceTexture) return null;
 
     return (
-        <mesh ref={meshRef} position={[0, 0.1, 0.45]} rotation={[0, 0, 0]}>
-            {/* 切り抜き画像を貼り付ける円形メッシュ */}
-            <circleGeometry args={[0.5, 32]} />
+        <mesh ref={meshRef} position={[0, 0.1, 0.46]} rotation={[0, 0, 0]}>
+            {/* 切り抜かれた縦長顔テクスチャを貼り付ける平面メッシュ */}
+            <planeGeometry args={[0.75, 1.0]} />
             <meshBasicMaterial 
                 map={faceTexture} 
                 transparent={true} 
@@ -299,7 +306,7 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
                     rotation={[0, 0, 0]} 
                 />
                 {/* ★ 顔メッシュを頭部ボーン・モデルの動きに lerp 追従させ、口パクパクデモ動作を実行 */}
-                <EnemyFaceMesh scene={selectedGltf.scene} />
+                <EnemyFaceMesh scene={selectedGltf.scene} groupRef={groupRef} />
             </group>
         </RigidBody>
     );
