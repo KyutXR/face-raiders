@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { useRef } from "react";
-import { Box } from "../objects/box";
+import { Enemy } from "../objects/Enemy";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
@@ -25,7 +25,7 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
                     <ambientLight />
                     <pointLight position={[0, 0, 0]} />
                     <GyroCameraController/>
-                    <Box />
+                    <Enemy position={[0, 0, -3]} />
                     <Stars
                       radius={100} // 星の点滅(拡大)度合い
                       depth={50} // 星の深さ
