@@ -6,10 +6,10 @@
       [
         {
           "EmergeTime": 1,
-          "LeaveTime": 13,
+          "LeaveTime": 20,
           "type": "normal",
           "position": [3, 2, -10],
-          "Movement": ["nori","tate","kaiten_up"]
+          "Movement": ["rightup","leftdown","rightdown","leftup"]
         }
       ],
       [
@@ -48,7 +48,7 @@
           "LeaveTime": 13,
           "type": "normal",
           "position": [3, 2, -10],
-          "Movement": ["nori","tate","kaiten_up"]
+          "Movement": ["rightup","tate","kaiten_up"]
         }
       ],
       [
@@ -72,34 +72,55 @@
     ]
   },
   "4": {
-    "waves": 1,
+    "waves": 3,
     "LimitTime": 120,
     "enemies": [
       [
         {
           "EmergeTime": 1,
-          "LeaveTime": 13,
+          "LeaveTime": 15,
           "type": "normal",
-          "position": [3, 2, -10],
-          "Movement": ["nori","tate","kaiten_up"]
+          "position": [7, 0, 7],
+          "Movement": ["nori","kaiten_down"]
+        },
+        {
+          "EmergeTime": 1,
+          "LeaveTime": 15,
+          "type": "normal",
+          "position": [7, -4, 7],
+          "Movement": ["nori","kaiten_up"]
         }
       ],
       [
         {
           "EmergeTime": 2,
-          "LeaveTime": 12,
+          "LeaveTime": 20,
           "type": "boss",
-          "position": [0, 5, -15],
-          "Movement": ["yoko"]
+          "position": [7, -6, 7],
+          "Movement": ["rightup","leftup","leftdown","rightdown"]
+        },
+        {
+          "EmergeTime": 2,
+          "LeaveTime": 20,
+          "type": "normal",
+          "position": [7, 6, 7],
+          "Movement": ["leftdown","rightdown","rightup","leftup"]
         }
       ],
       [
         {
-          "EmergeTime": 3,
+          "EmergeTime": 1,
           "LeaveTime": 15,
           "type": "normal",
-          "position": [1, 1, -12],
-          "Movement": ["yoko"]
+          "position": [7,0,7],
+          "Movement": ["nori","rightup"]
+        },
+        {
+          "EmergeTime": 1,
+          "LeaveTime": 15,
+          "type": "normal",
+          "position": [9,0,9],
+          "Movement": ["nori","rightdown"]
         }
       ]
     ]

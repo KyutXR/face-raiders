@@ -168,7 +168,7 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: Pl
                             onPlayerDamage={handlePlayerDamage}
                         />
                         <Enemy1 position={[0, 0, -3]} />
-                        <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody>
+                        {/* <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody> */}
                         <Stars
                             radius={100} // 星の点滅(拡大)度合い
                             depth={50} // 星の深さ
