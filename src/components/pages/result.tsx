@@ -10,6 +10,12 @@ import type { GameResultData } from "../../functions/score";
 interface ResultProps {
   setGamestate: (state: string) => void;
   gameResult?: GameResultData;
+  /** 「もう一度遊ぶ」ボタン押下時のコールバック（状態リセット＋遷移） */
+  onRetry?: () => void;
+  /** 「タイトルへ」ボタン押下時のコールバック（状態リセット＋遷移） */
+  onGoTitle?: () => void;
+  /** ゲーム状態リセット用関数 */
+  onReset?: () => void;
 }
 
 /**
@@ -18,7 +24,10 @@ interface ResultProps {
  */
 export const Result: React.FC<ResultProps> = ({
   setGamestate,
-  gameResult = { normalKills: 12, bossKills: 2 }, // デフォルトのテスト用撃破データ (12*1000 + 2*20000 = 52,000pt -> Sランク)
+  gameResult = { normalKills: 12, bossKills: 2 }, // デフォルトのテスト用撃破データ
+  onRetry,
+  onGoTitle,
+  onReset,
 }) => {
   // 合計スコアの計算
   const targetTotalScore = calculateTotalScore(gameResult);
@@ -289,7 +298,14 @@ export const Result: React.FC<ResultProps> = ({
           }}
         >
           <button
-            onClick={() => setGamestate("title")}
+            onClick={() => {
+              if (onGoTitle) {
+                onGoTitle();
+              } else {
+                onReset?.();
+                setGamestate("title");
+              }
+            }}
             style={{
               flex: 1,
               padding: "14px",
@@ -306,7 +322,14 @@ export const Result: React.FC<ResultProps> = ({
             タイトルへ
           </button>
           <button
-            onClick={() => setGamestate("register")}
+            onClick={() => {
+              if (onRetry) {
+                onRetry();
+              } else {
+                onReset?.();
+                setGamestate("register");
+              }
+            }}
             style={{
               flex: 1.5,
               padding: "14px",

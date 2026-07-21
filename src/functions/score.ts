@@ -11,6 +11,14 @@ export interface GameResultData {
 }
 
 /**
+ * 初期ゲーム結果データ（ゲームリセット時用）
+ */
+export const INITIAL_GAME_RESULT: GameResultData = {
+  normalKills: 0,
+  bossKills: 0,
+};
+
+/**
  * ランク評価の型
  */
 export type RankType = "S" | "A" | "B" | "C";

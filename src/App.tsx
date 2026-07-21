@@ -4,6 +4,7 @@ import { Title } from './components/pages/title';
 import { Register } from './components/pages/register';
 import { Result } from './components/pages/result';
 import { Playscreen } from './components/pages/Playscreen';
+import { INITIAL_GAME_RESULT } from './functions/score';
 import type { GameResultData } from './functions/score';
 
 function App() {
@@ -15,6 +16,29 @@ function App() {
     bossKills: 2,
   });
 
+  /**
+   * スコア・撃破数・ゲーム状態を初期状態へリセットする関数
+   */
+  const resetGameState = () => {
+    setGameResult(INITIAL_GAME_RESULT);
+  };
+
+  /**
+   * 「タイトルへ」戻る処理（ゲーム状態をリセットしてタイトル画面へ遷移）
+   */
+  const handleGoTitle = () => {
+    resetGameState();
+    setGamestate('title');
+  };
+
+  /**
+   * 「もう一度プレイ」処理（ゲーム状態をリセットしてプレイ/登録画面へ遷移）
+   */
+  const handleRetry = () => {
+    resetGameState();
+    setGamestate('register');
+  };
+
   return (
     <>
       {Gamestate === 'title' && <Title setGamestate={setGamestate} />}
@@ -23,7 +47,13 @@ function App() {
         <Playscreen setGamestate={setGamestate} setGameResult={setGameResult} />
       )}
       {Gamestate === 'result' && (
-        <Result setGamestate={setGamestate} gameResult={gameResult} />
+        <Result
+          setGamestate={setGamestate}
+          gameResult={gameResult}
+          onRetry={handleRetry}
+          onGoTitle={handleGoTitle}
+          onReset={resetGameState}
+        />
       )}
     </>
   );
