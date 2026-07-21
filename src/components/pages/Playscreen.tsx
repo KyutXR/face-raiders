@@ -14,7 +14,6 @@ import { EnemyDirectionOverlay } from "../ui/EnemyDirectionOverlay";
 import type { OffScreenIndicatorData } from "../ui/EnemyDirectionOverlay";
 import { OffScreenIndicatorTracker } from "../renderers/OffScreenIndicatorTracker";
 import { enemyRegistry } from "../../functions/enemyRegistry";
-import { COLORS } from "../../styles/colors";
 
 interface PlayscreenProps {
     setGamestate: (state: string) => void;
@@ -62,21 +61,6 @@ const PlayerInfoCard = styled.div`
   user-select: none;
 `;
 
-const PlayerAvatarImage = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid ${COLORS.accent};
-  object-fit: cover;
-`;
-
-const DefaultAvatar = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: ${COLORS.accent};
-`;
-
 const HeartContainer = styled.div`
   display: flex;
   gap: 6px;
@@ -91,7 +75,7 @@ const HeartIcon = styled.span<{ $isActive: boolean }>`
   transform: ${(props) => (props.$isActive ? "scale(1)" : "scale(0.85)")};
 `;
 
-export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: PlayscreenProps) => {
+export const Playscreen = ({ setGamestate, setGameResult, stageNum }: PlayscreenProps) => {
     const canvasRef = useRef(null);
     const bulletRendererRef = useRef<BulletRendererRef>(null);
 
