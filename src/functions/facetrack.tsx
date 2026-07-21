@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
+import styled from 'styled-components';
 import { faceDataStore } from './faceDatastore';
+
+const HiddenVideo = styled.video`
+  display: none;
+`;
+
 export function FaceTracker() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -57,5 +63,6 @@ export function FaceTracker() {
   }, []);
 
   // カメラ映像は裏で動かす（画面上は見えなくてもOK、または小さく配置）
-  return <video ref={videoRef} autoPlay playsInline style={{ display: 'none' }} />;
+  return <HiddenVideo ref={videoRef} autoPlay playsInline />;
 }
+
