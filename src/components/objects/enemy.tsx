@@ -303,7 +303,6 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
 
     // 突進中かどうかの判定 (Movement配列に "rush" が含まれている、かつ未撃破)
     const isRushing = info.Movement.includes("rush") && !isdefeated;
-    const rushSpeed = 5; // 突進スピード（秒速5ユニット）
 
     // 弾発射タイマー
     const lastShootTime = useRef(0);
