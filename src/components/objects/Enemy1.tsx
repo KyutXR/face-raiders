@@ -90,7 +90,7 @@ const createHemisphereFaceTexture = (faceImage?: HTMLImageElement | null): THREE
   return tex;
 };
 
-export const Enemy = ({
+export const Enemy1 = ({
   faceDataUrl,
   position = [0, 0, 0],
   rotation = [0, -Math.PI / 2, 0], // 元の状態の回転設定
