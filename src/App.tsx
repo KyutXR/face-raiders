@@ -15,7 +15,7 @@ function App() {
      {Gamestate=='register'&&<Register setGamestate={setGamestate}/>}  
      {Gamestate=='play'&&<Playscreen setGamestate={setGamestate} imgUrl={imgUrl}/>}
      {Gamestate =='result'&&<Result setGamestate={setGamestate}/>}
-     {Gamestate =='photo'&&<Photo setGamestate={setGamestate} setImgUrl={setImgUrl}/>}
+     {Gamestate =='photo'&&<Photo setGamestate={setGamestate} onPhotoCropped={setImgUrl}/>}
     </>
   )
 }
