@@ -5,10 +5,11 @@ import stageInfoData from '../StageInfo.json';
 
 // JSON上の敵情報の型定義（positionはnumber[]）
 interface RawEnemyInfo {
-  time:number;
+  EmergeTime: number;
+  LeaveTime: number;
   type: string;
   position: number[];
-  Movement: string;
+  Movement: string[];
 }
 
 // JSON上のステージ情報の型定義
@@ -45,11 +46,12 @@ export const loadStageInfo = (stageNum: number): JsonInfo | null => {
       .map((rawEnemy) => {
         const pos = rawEnemy.position;
         return {
-          time: rawEnemy.time,
+          EmergeTime: rawEnemy.EmergeTime ?? 0,
+          LeaveTime: rawEnemy.LeaveTime ?? 10,
           type: rawEnemy.type || 'normal',
           // [x, y, z] の配列から Three.js の Vector3 を生成
           position: new Vector3(pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0),
-          Movement: rawEnemy.Movement || 'straight',
+          Movement: Array.isArray(rawEnemy.Movement) ? rawEnemy.Movement : [],
         };
       })
   );

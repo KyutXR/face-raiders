@@ -5,24 +5,20 @@
     "enemies": [
       [
         {
-          "time": 1,
+          "EmergeTime": 1,
+          "LeaveTime": 13,
           "type": "normal",
-          "position": [3, 2, 0],
-          "Movement": "straight"
-        },
-        {
-          "time": 5,
-          "type": "normal",
-          "position": [0, 2, 0],
-          "Movement": "straight"
+          "position": [3, 2, -10],
+          "Movement": ["nori","tate","kaiten_up"]
         }
       ],
       [
         {
-          "time": 2,
+          "EmergeTime": 2,
+          "LeaveTime": 12,
           "type": "boss",
-          "position": [0, 5, -5],
-          "Movement": "zigzag"
+          "position": [0, 5, -15],
+          "Movement": ["yoko"]
         }
       ]
     ]
@@ -33,10 +29,11 @@
     "enemies": [
       [
         {
-          "time": 3,
-          "type": "fast",
-          "position": [1, 1, 0],
-          "Movement": "fast_straight"
+          "EmergeTime": 3,
+          "LeaveTime": 15,
+          "type": "normal",
+          "position": [1, 1, -12],
+          "Movement": ["yoko"]
         }
       ]
     ]
