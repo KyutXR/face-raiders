@@ -1,13 +1,12 @@
 import { Canvas } from "@react-three/fiber";
 import { useRef } from "react";
-import { Box } from "../objects/box";
 import { OrbitControls, Stars, Text }from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
 import { BulletRenderer } from "../renderers/BulletRenderer";
 import type { BulletRendererRef } from "../renderers/BulletRenderer";
-import { Physics ,RigidBody} from "@react-three/rapier";
+import { Physics} from "@react-three/rapier";
 import { Enemyrenderer } from "../renderers/EnemyRenderer";
 
 interface PlayscreenProps {
@@ -38,7 +37,6 @@ export const Playscreen = ({setGamestate, stageNum }: PlayscreenProps)=>{
                     <GyroCameraController/> //開発するときはctrl+/で消してもいい
                     <BulletRenderer ref={bulletRendererRef} />
                     <Enemyrenderer stage={stageNum} setGamestate={setGamestate}/>
-                    <RigidBody colliders="cuboid" restitution={0}type="fixed"><Box /></RigidBody>
                     <Stars
                       radius={100} // 星の点滅(拡大)度合い
                       depth={50} // 星の深さ
