@@ -1,14 +1,12 @@
 import { Canvas } from "@react-three/fiber";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Box } from "../objects/box";
 import { OrbitControls, Stars, Text } from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
 import { BulletRenderer } from "../renderers/BulletRenderer";
 import type { BulletRendererRef } from "../renderers/BulletRenderer";
-import { Physics, RigidBody } from "@react-three/rapier";
-import { Enemy1 } from "../objects/Enemy1";
+import { Physics } from "@react-three/rapier";
 import { Enemyrenderer } from "../renderers/EnemyRenderer";
 import { INITIAL_GAME_RESULT, type GameResultData } from "../../functions/score";
 import { EnemyDirectionOverlay } from "../ui/EnemyDirectionOverlay";
@@ -179,8 +177,6 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: Pl
                             onPlayerDamage={handlePlayerDamage}
                         />
                         <OffScreenIndicatorTracker onUpdateIndicators={setOffScreenIndicators} />
-                        <Enemy1 position={[0, 0, -3]} />
-                        <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody>
                         <Stars
                             radius={100} // 星の点滅(拡大)度合い
                             depth={50} // 星の深さ
