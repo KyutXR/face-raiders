@@ -14,6 +14,7 @@ export interface EnemyInfo{
     Movement:string[] // stringの配列 (例: ["tate", "nori"])
     EmergeTime:number // 出現時間
     LeaveTime:number  // 消去時間
+    Speed?: number;
 }
 
 // 敵のモデルアセットを事前にプリロード（マウント時のガクつきを防止）
@@ -251,8 +252,11 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
 
     // 弾発射タイマー
     const lastShootTime = useRef(0);
+    const spawnTime = useRef<number | null>(null);
     const isBoss = info.type === 'boss';
-    const shootInterval = isBoss ? 2.0 : 3.5; // ボスは2秒毎、通常敵は3.5秒毎に発射
+    const isSlow = info.Movement.includes("slow") && !isdefeated;
+    const shootInterval = isBoss ? 2.0 : isSlow ? 5.0 : 3.5;
+    const initialShootDelay = isSlow ? 2.0 : 0;
 
     const handledefeate = (event: CollisionPayload)=>{
         if (event?.other?.rigidBodyObject?.name === 'bullet') {
@@ -276,6 +280,16 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
 
     // 毎フレームのループ処理（カメラ追従、突進移動、カメラ衝突判定、弾発射）
     useFrame(({ camera, clock }) => {
+        const currentTime = clock.getElapsedTime();
+        if (spawnTime.current === null) {
+            spawnTime.current = currentTime;
+        }
+        const timeSinceSpawn = currentTime - (spawnTime.current ?? currentTime);
+
+        const isRushing = info.Movement.includes("rush") && !isdefeated;
+        const isSlow = info.Movement.includes("slow") && !isdefeated;
+        const slowSpeed = info.Speed ?? 0.2;
+        const rushSpeed = 5;
         if (isdefeated) return;
 
         if (rigidBodyRef.current) {
@@ -310,10 +324,23 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
                     );
                 }
 
+                // 3.5. 遅い敵（slow）処理の実行
+                else if (isSlow) {
+                    const direction = new THREE.Vector3().subVectors(camPos, enemyPos).normalize();
+                    rigidBodyRef.current.setLinvel(
+                        {
+                            x: direction.x * slowSpeed,
+                            y: direction.y * slowSpeed,
+                            z: direction.z * slowSpeed,
+                        },
+                        true
+                    );
+                }
+
                 // 4. 定期的な敵弾の発射処理
                 if (onShootBullet) {
-                    const currentTime = clock.getElapsedTime();
-                    if (currentTime - lastShootTime.current >= shootInterval) {
+                    const canFire = timeSinceSpawn >= initialShootDelay;
+                    if (canFire && currentTime - lastShootTime.current >= shootInterval) {
                         lastShootTime.current = currentTime;
                         
                         // 敵の頭・顔の高さからカメラ（視界中心）へ向けて発射

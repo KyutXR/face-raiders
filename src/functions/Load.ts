@@ -10,6 +10,7 @@ interface RawEnemyInfo {
   type: string;
   position: number[];
   Movement: string[];
+    Speed?: number;
 }
 
 // JSON上のステージ情報の型定義
@@ -52,6 +53,7 @@ export const loadStageInfo = (stageNum: number): JsonInfo | null => {
           // [x, y, z] の配列から Three.js の Vector3 を生成
           position: new Vector3(pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0),
           Movement: Array.isArray(rawEnemy.Movement) ? rawEnemy.Movement : [],
+          Speed: typeof rawEnemy.Speed === 'number' ? rawEnemy.Speed : 0.6,
         };
       })
   );
