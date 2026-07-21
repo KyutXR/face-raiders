@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "serve",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
@@ -28,6 +29,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "babel-plugin-react-compiler": "^1.0.0",
     "oxlint": "^1.71.0",
+    "serve": "^14.2.6",
     "typescript": "~6.0.2",
     "vite": "^8.1.1"
   }
