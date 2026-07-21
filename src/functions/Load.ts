@@ -5,10 +5,11 @@ import stageInfoData from '../StageInfo.json';
 
 // JSON上の敵情報の型定義（positionはnumber[]）
 interface RawEnemyInfo {
-  time:number;
+  EmergeTime: number;
+  LeaveTime: number;
   type: string;
   position: number[];
-  Movement: string;
+  Movement: string[];
 }
 
 // JSON上のステージ情報の型定義
@@ -45,11 +46,12 @@ export const loadStageInfo = (stageNum: number): JsonInfo | null => {
       .map((rawEnemy) => {
         const pos = rawEnemy.position;
         return {
-          time: rawEnemy.time,
+          EmergeTime: rawEnemy.EmergeTime ?? 0,
+          LeaveTime: rawEnemy.LeaveTime ?? 10,
           type: rawEnemy.type || 'normal',
           // [x, y, z] の配列から Three.js の Vector3 を生成
           position: new Vector3(pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0),
-          Movement: rawEnemy.Movement || 'straight',
+          Movement: Array.isArray(rawEnemy.Movement) ? rawEnemy.Movement : [],
         };
       })
   );
@@ -60,3 +62,35 @@ export const loadStageInfo = (stageNum: number): JsonInfo | null => {
     enemies: enemies,
   };
 };
+
+export interface StageSummary {
+  stageNum: number;
+  waves: number;
+  limitTime: number;
+  name?: string;
+  description?: string;
+}
+
+/**
+ * StageInfo.jsonに存在するすべてのステージの概要情報を取得します。
+ * @returns ステージ番号順にソートされたステージ情報の配列
+ */
+export const getAvailableStages = (): StageSummary[] => {
+  const data = stageInfoData as unknown as RawStageDataCollection;
+  return Object.keys(data)
+    .map((key) => parseInt(key, 10))
+    .filter((num) => !isNaN(num))
+    .sort((a, b) => a - b)
+    .map((stageNum) => {
+      const raw = data[stageNum.toString()];
+      const extendedRaw = raw as RawStageInfo & { name?: string; description?: string };
+      return {
+        stageNum,
+        waves: raw?.waves ?? 1,
+        limitTime: raw?.LimitTime ?? 60,
+        name: extendedRaw?.name,
+        description: extendedRaw?.description,
+      };
+    });
+};
+

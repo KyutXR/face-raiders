@@ -3,13 +3,15 @@ import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { Text } from '@react-three/drei';
 
+import { SCORE_PER_NORMAL_KILL } from '../../functions/score';
+
 interface ScorePopupProps {
   position: Vector3;
   score?: number;
 }
 
 // 衝突時にスコアテキストを表示して上昇＋フェードアウトさせるエフェクト
-export const ScorePopup = ({ position, score = 100 }: ScorePopupProps) => {
+export const ScorePopup = ({ position, score = SCORE_PER_NORMAL_KILL }: ScorePopupProps) => {
   const textRef = useRef<any>(null);
   const materialRef = useRef<any>(null);
   const [active, setActive] = useState(true);

@@ -1,9 +1,36 @@
 import { useState, useRef } from 'react';
 import ReactCrop, { type Crop } from 'react-image-crop';
+import styled from 'styled-components';
 import 'react-image-crop/dist/ReactCrop.css';
 
 //画像パス、サンプルのためpublic直下に配置、変更可能
 const IMAGE_SRC = '/sample.png';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+`;
+
+const TargetImage = styled.img`
+  max-height: 400px;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const ActionButton = styled.button`
+  padding: 8px 16px;
+`;
+
+const CroppedResultImage = styled.img`
+  border-radius: 50%;
+  border: 1px solid #ccc;
+`;
 
 export const Photo = ({ setGamestate, onPhotoCropped }: { setGamestate: (state: string) => void; onPhotoCropped: (imageUrl: string) => void; }) => {
   //切り抜き領域の設定(四角形)
@@ -52,21 +79,21 @@ export const Photo = ({ setGamestate, onPhotoCropped }: { setGamestate: (state: 
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', padding: '20px' }}>
+    <Container>
       <h3>顔を切り抜き</h3>
       
       <ReactCrop crop={crop} onChange={setCrop} aspect={1} circularCrop keepSelection>
-        <img ref={imgRef} src={IMAGE_SRC} alt="対象" style={{ maxHeight: '400px' }} />
+        <TargetImage ref={imgRef} src={IMAGE_SRC} alt="対象" />
       </ReactCrop>
 
-      <div>
-        <button onClick={handleCrop} style={{ padding: '8px', marginRight: '10px' }}>切り取る</button>
-        <button onClick={() => setGamestate('play')} style={{ padding: '8px' }}>次へ進む</button>
-      </div>
+      <ButtonGroup>
+        <ActionButton onClick={handleCrop}>切り取る</ActionButton>
+        <ActionButton onClick={() => setGamestate('play')}>次へ進む</ActionButton>
+      </ButtonGroup>
 
       {croppedUrl && (
-        <img src={croppedUrl} alt="結果" style={{ borderRadius: '50%', border: '1px solid #ccc' }} />
+        <CroppedResultImage src={croppedUrl} alt="結果" />
       )}
-    </div>
+    </Container>
   );
-};
+};

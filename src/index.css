@@ -1,3 +1,16 @@
+:root {
+  --color-primary: #E6F4EA;
+  --color-accent: #FF7474;
+  --color-bg: #E6F4EA;
+  --color-card-bg: #FFFFFF;
+  --color-text-main: #1E293B;
+  --color-text-sub: #64748B;
+  --color-border: #CBD5E1;
+
+  --primary-color: #E6F4EA;
+  --accent-color: #FF7474;
+}
+
 /* Reset CSS */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -5,13 +18,11 @@
   padding: 0;
 }
 
-html {
+html, body {
   height: 100%;
-}
-
-body {
-  height: 100%;
-  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -38,4 +49,19 @@ canvas {
   width: 100vw;
   height: 100vh;
   display: block;
+}
+
+@keyframes pulseIndicator {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.85;
+  }
 }
