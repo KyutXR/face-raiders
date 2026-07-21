@@ -1,8 +1,41 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 
 interface DeviceOrientationPermissionGateProps {
   children: React.ReactNode;
 }
+
+const PermissionRequestContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  z-index: 1000;
+  font-family: sans-serif;
+`;
+
+const MessageText = styled.p`
+  margin-bottom: 20px;
+  font-size: 18px;
+`;
+
+const PermissionButton = styled.button`
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #007aff;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+`;
 
 export const DeviceOrientationPermissionGate = ({
   children,
@@ -46,43 +79,14 @@ export const DeviceOrientationPermissionGate = ({
 
   if (needsPermission && !permissionGranted) {
     return (
-      <div
-        id="PermissionRequestContainer"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
-          color: "white",
-          zIndex: 1000,
-          fontFamily: "sans-serif",
-        }}
-      >
-        <p style={{ marginBottom: "20px", fontSize: "18px" }}>
+      <PermissionRequestContainer id="PermissionRequestContainer">
+        <MessageText>
           ジャイロセンサーのアクセス許可が必要です
-        </p>
-        <button
-          onClick={requestPermission}
-          style={{
-            padding: "12px 24px",
-            fontSize: "16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#007aff",
-            color: "white",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
+        </MessageText>
+        <PermissionButton onClick={requestPermission}>
           許可する
-        </button>
-      </div>
+        </PermissionButton>
+      </PermissionRequestContainer>
     );
   }
 
@@ -92,3 +96,4 @@ export const DeviceOrientationPermissionGate = ({
 
   return null;
 };
+

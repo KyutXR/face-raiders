@@ -1,4 +1,5 @@
 import React from "react";
+import styled, { keyframes } from "styled-components";
 
 export interface OffScreenIndicatorData {
     id: string;
@@ -12,60 +13,75 @@ interface EnemyDirectionOverlayProps {
     indicators: OffScreenIndicatorData[];
 }
 
+const OverlayContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 90;
+  overflow: hidden;
+`;
+
+const IndicatorPositioner = styled.div<{ $x: number; $y: number; $glowColor: string }>`
+  position: absolute;
+  left: ${(props) => props.$x}px;
+  top: ${(props) => props.$y}px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 0.05s ease-out, top 0.05s ease-out;
+  filter: drop-shadow(0 0 8px ${(props) => props.$glowColor});
+`;
+
+const IndicatorRotator = styled.div<{ $angleDeg: number }>`
+  transform: rotate(${(props) => props.$angleDeg}deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const pulseAnimation = keyframes`
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+`;
+
+const IndicatorIconContainer = styled.div<{ $isBoss: boolean }>`
+  width: ${(props) => (props.$isBoss ? "36px" : "28px")};
+  height: ${(props) => (props.$isBoss ? "36px" : "28px")};
+  animation: ${pulseAnimation} 1.2s infinite ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const EnemyDirectionOverlay: React.FC<EnemyDirectionOverlayProps> = ({ indicators }) => {
     return (
-        <div
-            style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                pointerEvents: "none",
-                zIndex: 90,
-                overflow: "hidden",
-            }}
-        >
+        <OverlayContainer>
             {indicators.map((ind) => {
                 const mainColor = "#FF5555";
                 const glowColor = "rgba(255, 85, 85, 0.6)";
                 const isBoss = ind.type === "boss";
 
                 return (
-                    <div
+                    <IndicatorPositioner
                         key={ind.id}
-                        style={{
-                            position: "absolute",
-                            left: `${ind.x}px`,
-                            top: `${ind.y}px`,
-                            transform: "translate(-50%, -50%)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            transition: "left 0.05s ease-out, top 0.05s ease-out",
-                            filter: `drop-shadow(0 0 8px ${glowColor})`,
-                        }}
+                        $x={ind.x}
+                        $y={ind.y}
+                        $glowColor={glowColor}
                     >
                         {/* 回転（rotate）を適用するコンテナ */}
-                        <div
-                            style={{
-                                transform: `rotate(${ind.angleDeg}deg)`,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
+                        <IndicatorRotator $angleDeg={ind.angleDeg}>
                             {/* アニメーション（scale / opacity）を適用するインナーSVGコンテナ */}
-                            <div
-                                style={{
-                                    width: isBoss ? "36px" : "28px",
-                                    height: isBoss ? "36px" : "28px",
-                                    animation: "pulseIndicator 1.2s infinite ease-in-out",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
+                            <IndicatorIconContainer $isBoss={isBoss}>
                                 <svg
                                     viewBox="0 0 24 24"
                                     width="100%"
@@ -83,11 +99,12 @@ export const EnemyDirectionOverlay: React.FC<EnemyDirectionOverlayProps> = ({ in
                                         fillOpacity={0.35}
                                     />
                                 </svg>
-                            </div>
-                        </div>
-                    </div>
+                            </IndicatorIconContainer>
+                        </IndicatorRotator>
+                    </IndicatorPositioner>
                 );
             })}
-        </div>
+        </OverlayContainer>
     );
 };
+
