@@ -34,7 +34,7 @@ export const Playscreen = ({setGamestate, stageNum }: PlayscreenProps)=>{
                     <CameraBackground />
                     <ambientLight />
                     <pointLight position={[0, 0, 0]} />
-                    <GyroCameraController/> //開発するときはctrl+/で消してもいい
+                    {/* <GyroCameraController/> //開発するときはctrl+/で消してもいい */}
                     <BulletRenderer ref={bulletRendererRef} />
                     <Enemyrenderer stage={stageNum} setGamestate={setGamestate}/>
                     <Stars
