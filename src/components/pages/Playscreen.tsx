@@ -40,9 +40,13 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum, imgUrl }: Pl
                 {imgUrl && (
                     <img
                         src={imgUrl}
+                        alt="Registered Face"
                         style={{
                             position: 'absolute', top: '20px', left: '20px', // 左上に固定
-                            width: '60px', height: '60px', borderRadius: '50%', // サイズと丸み
+                            width: '54px', height: '54px', borderRadius: '50%', // サイズと丸み
+                            border: '3px solid #FF7474',
+                            boxShadow: '0 4px 12px rgba(255, 116, 116, 0.4)',
+                            objectFit: 'cover',
                             zIndex: 100 // 3Dキャンバスより手前に表示させる
                         }}
                     />

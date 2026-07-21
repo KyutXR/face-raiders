@@ -3,12 +3,13 @@ import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import styled, { keyframes } from 'styled-components';
 import { faceDataStore } from '../../functions/faceDatastore';
+import { COLORS } from '../../styles/colors';
 
 // --- アニメーション ---
 const pulseGlow = keyframes`
-  0% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2); }
-  50% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), inset 0 0 25px rgba(0, 255, 255, 0.4); }
-  100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2); }
+  0% { border-color: ${COLORS.primary}; box-shadow: 0 0 10px rgba(230, 244, 234, 0.3); }
+  50% { border-color: ${COLORS.accent}; box-shadow: 0 0 18px rgba(255, 116, 116, 0.5); }
+  100% { border-color: ${COLORS.primary}; box-shadow: 0 0 10px rgba(230, 244, 234, 0.3); }
 `;
 
 const fadeIn = keyframes`
@@ -21,42 +22,49 @@ const Container = styled.div`
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at center, #1a233a 0%, #0a0e17 100%);
-  color: #fff;
+  height: 100dvh;
+  background-color: #0F172A;
+  color: ${COLORS.primary};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  gap: 20px;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  padding: 16px;
+  box-sizing: border-box;
+`;
+
+const ContentBox = styled.div`
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 `;
 
 const HeaderTitle = styled.h2`
   margin: 0;
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   letter-spacing: 2px;
-  background: linear-gradient(135deg, #00ffff 0%, #00ff88 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
+  color: ${COLORS.primary};
+  text-align: center;
 `;
 
 const CardContainer = styled.div`
   position: relative;
-  width: 90%;
-  max-width: 640px;
-  background: rgba(18, 25, 41, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 255, 255, 0.25);
-  border-radius: 20px;
+  width: 100%;
+  background-color: #1E293B;
+  border: 2px solid #334155;
+  border-radius: 24px;
   padding: 20px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  animation: ${fadeIn} 0.4s ease-out;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  animation: ${fadeIn} 0.3s ease-out;
 `;
 
 const CameraWrapper = styled.div`
@@ -66,103 +74,116 @@ const CameraWrapper = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 16px;
+  background-color: #0F172A;
 `;
 
 const StyledVideo = styled.video`
   width: 100%;
-  max-height: 60vh;
+  max-height: 52vh;
   object-fit: cover;
   transform: scaleX(-1);
-  border-radius: 14px;
+  border-radius: 16px;
 `;
 
 // 縦長（楕円形）ガイドリング
 const OvalGuide = styled.div`
   position: absolute;
-  width: 210px;
-  height: 280px;
+  width: 200px;
+  height: 260px;
   border-radius: 50%;
-  border: 3px dashed #00ffff;
-  animation: ${pulseGlow} 2s infinite ease-in-out;
+  border: 3px dashed ${COLORS.primary};
+  animation: ${pulseGlow} 2.5s infinite ease-in-out;
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 255, 255, 0.04);
+  background: rgba(15, 23, 42, 0.2);
 `;
 
 const GuideText = styled.span`
   font-size: 14px;
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  color: ${COLORS.primary};
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 12px;
-  margin-top: 18px;
-  flex-wrap: wrap;
-  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const PrimaryButton = styled.button`
-  padding: 12px 28px;
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 20px;
   font-size: 16px;
   font-weight: 700;
-  background: linear-gradient(135deg, #00ffff 0%, #00bfff 100%);
-  color: #080d1a;
+  background-color: ${COLORS.accent};
+  color: #0F172A;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(255, 116, 116, 0.3);
   transition: all 0.2s ease-in-out;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 116, 116, 0.45);
   }
 
   &:active {
-    transform: translateY(0);
+    transform: translateY(1px) scale(0.98);
   }
 `;
 
 const SecondaryButton = styled.button`
-  padding: 12px 24px;
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 20px;
   font-size: 15px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
-  color: #e0e0e0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.18);
-    color: #fff;
-  }
-`;
-
-const SuccessButton = styled.button`
-  padding: 12px 28px;
-  font-size: 16px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
-  color: #080d1a;
+  background-color: #334155;
+  color: ${COLORS.primary};
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.6);
+    background-color: #475569;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const OutlineButton = styled.button`
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: transparent;
+  color: ${COLORS.primary};
+  border: 2px solid ${COLORS.primary};
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: rgba(230, 244, 234, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -170,23 +191,30 @@ const CropWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
+  width: 100%;
 `;
 
 const ResultSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 12px;
   animation: ${fadeIn} 0.3s ease-out;
 `;
 
+const ResultText = styled.span`
+  font-size: 14px;
+  color: ${COLORS.primary};
+  font-weight: 700;
+`;
+
 const ResultImage = styled.img`
-  width: 90px;
-  height: 120px;
+  width: 80px;
+  height: 110px;
   border-radius: 50%;
-  border: 3px solid #00ffff;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  border: 3px solid ${COLORS.accent};
+  box-shadow: 0 4px 14px rgba(255, 116, 116, 0.4);
   object-fit: cover;
   margin-top: 8px;
 `;
@@ -252,7 +280,7 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // ★ 縦長楕円にクリップ（切り抜き）
+    // 縦長楕円にクリップ（切り抜き）
     ctx.beginPath();
     ctx.ellipse(crop.width / 2, crop.height / 2, crop.width / 2, crop.height / 2, 0, 0, Math.PI * 2);
     ctx.clip();
@@ -280,62 +308,67 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
 
   return (
     <Container>
-      <HeaderTitle>FACE REGISTRATION</HeaderTitle>
+      <ContentBox>
+        <HeaderTitle>FACE REGISTRATION</HeaderTitle>
 
-      <CardContainer>
-        {!capturedImage ? (
-          <CameraWrapper>
-            <StyledVideo ref={videoRef} autoPlay playsInline muted />
+        <CardContainer>
+          {!capturedImage ? (
+            <CameraWrapper>
+              <StyledVideo ref={videoRef} autoPlay playsInline muted />
 
-            {/* 縦長（楕円形）ガイドリング */}
-            <OvalGuide>
-              <GuideText>
-                縦長の枠の中に顔を<br />合わせてください
-              </GuideText>
-            </OvalGuide>
+              {/* 縦長（楕円形）ガイドリング */}
+              <OvalGuide>
+                <GuideText>
+                  縦長の枠の中に顔を<br />合わせてください
+                </GuideText>
+              </OvalGuide>
 
-            <PrimaryButton
-              onClick={handleCapture}
-              style={{ position: 'absolute', bottom: '20px', zIndex: 10 }}
-            >
-              📸 写真を撮影
-            </PrimaryButton>
-          </CameraWrapper>
-        ) : (
-          <CropWrapper>
-            {/* aspect={0.75} で 3:4 の縦長アスペクト比固定、circularCrop で縦長楕円切り抜き枠表示 */}
-            <ReactCrop crop={crop} onChange={setCrop} aspect={0.75} circularCrop keepSelection>
-              <img
-                ref={imgRef}
-                src={capturedImage}
-                alt="撮影顔写真"
-                style={{ maxHeight: '380px', borderRadius: '12px' }}
-              />
-            </ReactCrop>
-
-            <ButtonGroup>
-              <SecondaryButton onClick={() => setCapturedImage(null)}>
-                🔄 撮り直す
-              </SecondaryButton>
-              <PrimaryButton onClick={handleCrop}>
-                ✂️ 顔を切り取る
+              <PrimaryButton
+                onClick={handleCapture}
+                style={{ position: 'absolute', bottom: '16px', zIndex: 10, width: 'calc(100% - 32px)' }}
+              >
+                写真を撮影
               </PrimaryButton>
-              <SuccessButton onClick={() => setGamestate('stageSelect')}>
-                🎯 ステージ選択へ ➔
-              </SuccessButton>
-            </ButtonGroup>
+            </CameraWrapper>
+          ) : (
+            <CropWrapper>
+              <ReactCrop crop={crop} onChange={setCrop} aspect={0.75} circularCrop keepSelection>
+                <img
+                  ref={imgRef}
+                  src={capturedImage}
+                  alt="撮影顔写真"
+                  style={{ maxHeight: '340px', borderRadius: '12px' }}
+                />
+              </ReactCrop>
 
-            {croppedUrl && (
-              <ResultSection>
-                <span style={{ fontSize: '14px', color: '#00ff88', fontWeight: 'bold' }}>
-                  ✓ 縦長切り抜き完了！
-                </span>
-                <ResultImage src={croppedUrl} alt="切り抜き結果" />
-              </ResultSection>
-            )}
-          </CropWrapper>
-        )}
-      </CardContainer>
+              <ButtonGroup>
+                <PrimaryButton onClick={handleCrop}>
+                  顔を切り取る
+                </PrimaryButton>
+
+                <SecondaryButton onClick={() => setCapturedImage(null)}>
+                  撮り直す
+                </SecondaryButton>
+
+                {croppedUrl && (
+                  <OutlineButton onClick={() => setGamestate('stageSelect')}>
+                    ステージ選択へ
+                  </OutlineButton>
+                )}
+              </ButtonGroup>
+
+              {croppedUrl && (
+                <ResultSection>
+                  <ResultText>
+                    登録用顔写真の作成完了
+                  </ResultText>
+                  <ResultImage src={croppedUrl} alt="切り抜き結果" />
+                </ResultSection>
+              )}
+            </CropWrapper>
+          )}
+        </CardContainer>
+      </ContentBox>
     </Container>
   );
 };
