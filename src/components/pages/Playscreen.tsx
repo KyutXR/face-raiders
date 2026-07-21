@@ -6,11 +6,18 @@ import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
 import { DeviceOrientationPermissionGate } from "../DeviceOrientationPermissionGate";
 
-export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => void }) => {
+import type { GameResultData } from "../../functions/score";
+
+interface PlayscreenProps {
+  setGamestate: (state: string) => void;
+  setGameResult?: (result: GameResultData) => void;
+}
+
+export const Playscreen = ({ setGamestate }: PlayscreenProps) => {
   const canvasRef = useRef(null);
 
   const onCanvasClick = () => {
-    setGamestate('result');//画面クリックでリザルト画面を出力
+    setGamestate("result"); // 画面クリックでリザルト画面を出力
   };
 
   return (
@@ -18,14 +25,14 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
       <div id="CanvasContainer">
         <Canvas
           ref={canvasRef}
-          shadows={'soft'}
+          shadows={"soft"}
           onClick={onCanvasClick}
         >
           <CameraBackground />
           <ambientLight />
           <pointLight position={[0, 0, 0]} />
           <GyroCameraController />
-          <Enemy position={[0, 0, -3]} />
+          <Enemy1 position={[0, 0, -3]} />
           <Stars
             radius={100} // 星の点滅(拡大)度合い
             depth={50} // 星の深さ
@@ -40,4 +47,4 @@ export const Playscreen = ({ setGamestate }: { setGamestate: (state: string) => 
       </div>
     </DeviceOrientationPermissionGate>
   );
-}
+};
