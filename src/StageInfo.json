@@ -29,11 +29,44 @@
     "enemies": [
       [
         {
-          "EmergeTime": 3,
-          "LeaveTime": 15,
+          "EmergeTime": 1,
+          "LeaveTime": 20,
           "type": "normal",
-          "position": [1, 1, -12],
-          "Movement": ["yoko"]
+          "position": [-1.5, 0, -4],
+          "Movement": ["slow", "yoko"],
+          "Speed": 0.5
+        },
+        {
+          "EmergeTime": 1.5,
+          "LeaveTime": 20,
+          "type": "normal",
+          "position": [-0.75, 0, -4],
+          "Movement": ["slow", "yoko"],
+          "Speed": 0.5
+        },
+        {
+          "EmergeTime": 2,
+          "LeaveTime": 20,
+          "type": "normal",
+          "position": [0, 0, -4],
+          "Movement": ["slow", "yoko"],
+          "Speed": 0.5
+        },
+         {
+          "EmergeTime": 2.5,
+          "LeaveTime": 20,
+          "type": "normal",
+          "position": [0.75, 0, -4],
+          "Movement": ["slow", "yoko"],
+          "Speed": 0.5
+        },
+         {
+          "EmergeTime": 3,
+          "LeaveTime": 20,
+          "type": "normal",
+          "position": [1.5, 0, -4],
+          "Movement": ["slow", "yoko"],
+          "Speed": 0.5
         }
       ]
     ]

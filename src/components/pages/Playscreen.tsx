@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useRef, useState, useCallback } from "react";
-import styled from "styled-components";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import styled, { keyframes, css } from "styled-components";
 import { OrbitControls, Stars, Text } from "@react-three/drei";
 import { GyroCameraController } from "../../functions/GyroCameraController";
 import { CameraBackground } from "../../functions/CameraBackground";
@@ -14,6 +14,7 @@ import { EnemyDirectionOverlay } from "../ui/EnemyDirectionOverlay";
 import type { OffScreenIndicatorData } from "../ui/EnemyDirectionOverlay";
 import { OffScreenIndicatorTracker } from "../renderers/OffScreenIndicatorTracker";
 import { enemyRegistry } from "../../functions/enemyRegistry";
+import { loadStageInfo } from "../../functions/Load";
 
 interface PlayscreenProps {
     setGamestate: (state: string) => void;
@@ -75,11 +76,67 @@ const HeartIcon = styled.span<{ $isActive: boolean }>`
   transform: ${(props) => (props.$isActive ? "scale(1)" : "scale(0.85)")};
 `;
 
+const timerPulseAnimation = keyframes`
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 25px rgba(255, 77, 77, 0.85);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+  }
+`;
+
+const TimerCard = styled.div<{ $isWarning: boolean }>`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 1px solid ${(props) => (props.$isWarning ? "rgba(255, 77, 77, 0.8)" : "rgba(255, 255, 255, 0.25)")};
+  z-index: 100;
+  user-select: none;
+  transition: border-color 0.3s ease, color 0.3s ease;
+  ${(props) =>
+    props.$isWarning &&
+    css`
+      animation: ${timerPulseAnimation} 1s infinite ease-in-out;
+    `}
+`;
+
+const TimerText = styled.span<{ $isWarning: boolean }>`
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: ${(props) => (props.$isWarning ? "#FF4D4D" : "#FFFFFF")};
+  text-shadow: ${(props) => (props.$isWarning ? "0 0 10px rgba(255, 77, 77, 0.8)" : "0 0 4px rgba(255, 255, 255, 0.5)")};
+`;
+
+const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
 export const Playscreen = ({ setGamestate, setGameResult, stageNum }: PlayscreenProps) => {
     const canvasRef = useRef(null);
     const bulletRendererRef = useRef<BulletRendererRef>(null);
 
+    const stagedata = useMemo(() => loadStageInfo(stageNum), [stageNum]);
+    const limitTime = stagedata?.LimitTime ?? 60;
+
     const [playerHp, setPlayerHp] = useState(MAX_HP);
+    const [timeLeft, setTimeLeft] = useState(limitTime);
     const [isDamageFlashing, setIsDamageFlashing] = useState(false);
     const [offScreenIndicators, setOffScreenIndicators] = useState<OffScreenIndicatorData[]>([]);
     const isGameOverRef = useRef(false);
@@ -92,6 +149,34 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum }: Playscreen
             enemyRegistry.clear();
         };
     }, [setGameResult]);
+
+    // カウントダウンタイマー
+    useEffect(() => {
+        const initialTime = stagedata?.LimitTime ?? 60;
+        setTimeLeft(initialTime);
+
+        const timerId = setInterval(() => {
+            if (isGameOverRef.current) return;
+
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timerId);
+                    if (!isGameOverRef.current) {
+                        isGameOverRef.current = true;
+                        setTimeout(() => {
+                            setGamestate("result");
+                        }, 500);
+                    }
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            clearInterval(timerId);
+        };
+    }, [stagedata, setGamestate]);
 
     // プレイヤーがダメージを受けた時のハンドラ
     const handlePlayerDamage = useCallback((amount = 1) => {
@@ -120,6 +205,8 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum }: Playscreen
         bulletRendererRef.current?.shoot(); // 画面クリックで弾を発射する
     };
 
+    const isWarning = timeLeft <= 10;
+
     return (
         <DeviceOrientationPermissionGate>
             <CanvasContainer id="CanvasContainer">
@@ -139,6 +226,11 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum }: Playscreen
                         ))}
                     </HeartContainer>
                 </PlayerInfoCard>
+
+                {/* ステージ制限時間タイマー表示 */}
+                <TimerCard $isWarning={isWarning}>
+                    <TimerText $isWarning={isWarning}>{formatTime(timeLeft)}</TimerText>
+                </TimerCard>
 
                 {/* 画面外敵方向矢印オーバーレイ */}
                 <EnemyDirectionOverlay indicators={offScreenIndicators} />
