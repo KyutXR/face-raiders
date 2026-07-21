@@ -14,33 +14,33 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.55);
+  width: 24px;
+  height: 24px;
+  border: 2px solid #FF7474;
   border-radius: 50%;
   pointer-events: none;
+  box-sizing: border-box;
 }
 
 .crosshair::before, .crosshair::after {
   content: '';
   position: absolute;
-  background: rgba(255, 255, 255, 0.55);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #FF7474;
 }
 
 /* Horizontal line of crosshair */
 .crosshair::before {
-  top: 8px;
-  left: -8px;
-  width: 34px;
+  width: 32px;
   height: 2px;
 }
 
 /* Vertical line of crosshair */
 .crosshair::after {
-  top: -8px;
-  left: 8px;
   width: 2px;
-  height: 34px;
+  height: 32px;
 }
 
 
