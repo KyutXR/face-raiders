@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Title = ({ setGamestate }: { setGamestate: (state: string) => void }) => {
+export const Title = ({ setGamestate, setStageNum }: { setGamestate: (state: string) => void, setStageNum: (num: number) => void }) => {
 
   const TitleWrapper = styled.div`
     position: relative;
@@ -9,27 +9,25 @@ export const Title = ({ setGamestate }: { setGamestate: (state: string) => void 
 
   `
 
-  const Button = styled.button`
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: none;
-    cursor: pointer;
-  `
-
   const Logo = styled.img`
     position: absolute;
     width: 100%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-  `
+    `
+
+  const selectStage = (num: number) => {
+    setStageNum(num);
+    setGamestate("register"); // ステージを選択して登録画面へ遷移
+  };
 
   return (
     <TitleWrapper>
-      <Button onClick={() => setGamestate("photo")}>
-        <Logo src="/logo.svg" alt="logo" />
-      </Button>
+      <Logo src="/logo.svg" alt="logo" />
+      <button onClick={() => selectStage(1)}>Stage 1</button>
+      <button onClick={() => selectStage(2)}>Stage 2</button>
     </TitleWrapper>
+
   );
 };
