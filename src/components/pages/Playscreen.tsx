@@ -160,12 +160,7 @@ export const Playscreen = ({ setGamestate, setGameResult, stageNum }: Playscreen
                             setGameResult={setGameResult}
                             onPlayerDamage={handlePlayerDamage}
                         />
-<<<<<<< HEAD
-                        <Enemy1 position={[0, 0, -3]} />
-                        {/* <RigidBody colliders="cuboid" restitution={0} type="fixed"><Box /></RigidBody> */}
-=======
                         <OffScreenIndicatorTracker onUpdateIndicators={setOffScreenIndicators} />
->>>>>>> 01c5bd479ac79ce6dc2fd6cbcb7a284f7b7fc11e
                         <Stars
                             radius={100} // 星の点滅(拡大)度合い
                             depth={50} // 星の深さ
