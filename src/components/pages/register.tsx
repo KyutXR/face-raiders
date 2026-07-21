@@ -51,7 +51,7 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
     }
   };
 
-  // 切り取るボタンの関数 (提示コードベース)
+  // 切り取るボタンの関数
   const handleCrop = () => {
     const img = imgRef.current;
     if (!img || !crop.width || !crop.height) return;
@@ -79,14 +79,14 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
       0, 0, crop.width, crop.height
     );
 
-    // 描画データを出力、形式はpng、urlを作成しfaceDataStoreに保存
+    // 描画データを出力
     canvas.toBlob(blob => {
       if (!blob) return;
       if (croppedUrl) URL.revokeObjectURL(croppedUrl); 
       const newUrl = URL.createObjectURL(blob);
       setCroppedUrl(newUrl);
       
-      // ★ faceDataStoreに登録
+      // faceDataStoreに登録
       faceDataStore.setCroppedFace(newUrl);
     }, 'image/png');
   };
@@ -108,8 +108,8 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
       <h2 style={{ margin: '0' }}>顔の登録・切り抜き</h2>
 
       {!capturedImage ? (
-        // 1. 画面いっぱいの内カメラプレビュー表示と撮影ボタン
-        <div style={{ position: 'relative', width: '90%', maxWidth: '600px', maxHeight: '70vh', display: 'flex', justifyContent: 'center' }}>
+        // 1. 画面いっぱいの内カメラプレビュー表示、円形白い薄いナビガイド、撮影ボタン
+        <div style={{ position: 'relative', width: '90%', maxWidth: '600px', maxHeight: '70vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <video
             ref={videoRef}
             autoPlay
@@ -124,6 +124,26 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
               border: '2px solid #00ffff'
             }}
           />
+
+          {/* ★ 円形の白く薄いナビガイドリング */}
+          <div style={{
+            position: 'absolute',
+            width: '230px',
+            height: '230px',
+            borderRadius: '50%',
+            border: '3px dashed rgba(255, 255, 255, 0.75)',
+            boxShadow: '0 0 20px rgba(255, 255, 255, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.15)',
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)'
+          }}>
+            <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.9)', textShadow: '0 1px 4px rgba(0,0,0,0.8)', textAlign: 'center', fontWeight: 'bold' }}>
+              円の中に顔を<br />合わせてください
+            </span>
+          </div>
+
           <button
             onClick={handleCapture}
             style={{
@@ -137,7 +157,8 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
               border: 'none',
               borderRadius: '28px',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(0,255,255,0.4)'
+              boxShadow: '0 4px 12px rgba(0,255,255,0.4)',
+              zIndex: 10
             }}
           >
             📸 写真を撮る

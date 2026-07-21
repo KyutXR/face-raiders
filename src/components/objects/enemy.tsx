@@ -19,21 +19,63 @@ useGLTF.preload('/gld/enemy_a.glb');
 
 /**
  * 敵キャラクターの正面に登録・切り抜かれた顔テクスチャを貼り付けて表示するコンポーネント
+ * 敵の頭部ボーンおよびモデルの動きに対して lerp(線形補間) で追従し、
+ * デモ動作として口をパクパク開閉させるアニメーション動作を実行します。
  */
-export const EnemyFaceMesh = () => {
+export const EnemyFaceMesh = ({ scene }: { scene?: THREE.Group }) => {
+    const meshRef = useRef<THREE.Mesh>(null);
     const [faceTexture, setFaceTexture] = useState<THREE.Texture | null>(faceDataStore.croppedFaceTexture);
 
-    // テクスチャの非同期ロード・更新を監視
-    useFrame(() => {
+    // モデル内の頭部・顔ボーンの参照を保持
+    const headBoneRef = useRef<THREE.Object3D | null>(null);
+
+    useEffect(() => {
+        if (scene) {
+            scene.traverse((child) => {
+                const lower = child.name.toLowerCase();
+                if (lower.includes("head") || lower.includes("face")) {
+                    headBoneRef.current = child;
+                }
+            });
+        }
+    }, [scene]);
+
+    // 毎フレームの補間追従処理 (lerp) & 口パクパクデモアニメーション
+    useFrame((state, delta) => {
         if (faceDataStore.croppedFaceTexture && faceTexture !== faceDataStore.croppedFaceTexture) {
             setFaceTexture(faceDataStore.croppedFaceTexture);
         }
+
+        if (!meshRef.current) return;
+
+        // 1. 理想的な顔の相対位置
+        const targetPos = new THREE.Vector3(0, 0.1, 0.45);
+
+        // 頭部ボーンが存在する場合は、そのボーンの位置にオフセットを加算
+        if (headBoneRef.current) {
+            const bonePos = new THREE.Vector3();
+            headBoneRef.current.getWorldPosition(bonePos);
+            if (meshRef.current.parent) {
+                meshRef.current.parent.worldToLocal(bonePos);
+                targetPos.copy(bonePos).add(new THREE.Vector3(0, 0, 0.15));
+            }
+        }
+
+        // 緩やかに吸い付くように線形補間 (lerp) 追従
+        const lerpFactor = Math.min(1, delta * 12);
+        meshRef.current.position.lerp(targetPos, lerpFactor);
+
+        // 2. ★ メッシュが適用されていることを視認できる口パクパク動作デモ
+        // 時間経過 (state.clock.elapsedTime) に合わせて、縦方向(Y軸)のスケールを 1.0 〜 1.25 の間でパクパク開閉伸縮
+        const mouthMouthOpen = Math.abs(Math.sin(state.clock.elapsedTime * 8));
+        meshRef.current.scale.y = 1.0 + mouthMouthOpen * 0.22;
+        meshRef.current.scale.x = 1.0 - mouthMouthOpen * 0.05; // 縦に開くときに少し横を絞るリアリティ
     });
 
     if (!faceTexture) return null;
 
     return (
-        <mesh position={[0, 0.1, 0.45]} rotation={[0, 0, 0]}>
+        <mesh ref={meshRef} position={[0, 0.1, 0.45]} rotation={[0, 0, 0]}>
             {/* 切り抜き画像を貼り付ける円形メッシュ */}
             <circleGeometry args={[0.5, 32]} />
             <meshBasicMaterial 
@@ -46,14 +88,6 @@ export const EnemyFaceMesh = () => {
     );
 };
 
-/**
- * 敵キャラクターのアニメーションを再生・制御するカスタムフック（別定義の関数）
- * @param animations GLTFモデルに含まれるアニメーションクリップの配列
- * @param groupRef アニメーションをバインドするグループコンポーネントのRef
- * @param isDefeated 撃破されているかどうかのフラグ
- * @param movement 動作アニメーションの指定配列 (例: ["tate", "nori"])
- * @param isRushing 突進中かどうかのフラグ
- */
 const ANIMATION_COOLDOWN_MS = 400;
 
 export const useEnemyAnimation = (
@@ -264,8 +298,8 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
                     scale={[scaleFactor, scaleFactor, scaleFactor]} 
                     rotation={[0, 0, 0]} 
                 />
-                {/* ★ 切り抜かれた顔テクスチャを貼り付けたメッシュ */}
-                <EnemyFaceMesh />
+                {/* ★ 顔メッシュを頭部ボーン・モデルの動きに lerp 追従させ、口パクパクデモ動作を実行 */}
+                <EnemyFaceMesh scene={selectedGltf.scene} />
             </group>
         </RigidBody>
     );
