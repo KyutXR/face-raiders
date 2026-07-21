@@ -3,6 +3,7 @@ import { useState, forwardRef, useImperativeHandle } from "react";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import { Bullet } from "../objects/bullets";
+import { playPlayerShootSound } from "../../utils/sound";
 
 export interface BulletRendererRef {
     shoot: () => void;
@@ -14,6 +15,9 @@ export const BulletRenderer = forwardRef<BulletRendererRef>((_, ref) => {
     const camera = useThree((state) => state.camera);
 
     const shoot = () => {
+        // 発射音を再生
+        playPlayerShootSound();
+
         const direct = new Vector3();
         camera.getWorldDirection(direct);
         
@@ -28,7 +32,6 @@ export const BulletRenderer = forwardRef<BulletRendererRef>((_, ref) => {
         };
 
         setBullets((prevBullets) => [...prevBullets, newBullet]);
-        console.log("test");
     };
 
     useImperativeHandle(ref, () => ({
