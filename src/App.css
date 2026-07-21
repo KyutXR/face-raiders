@@ -14,32 +14,31 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #FF7474;
   border-radius: 50%;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(255, 116, 116, 0.6);
+  box-sizing: border-box;
 }
 
 .crosshair::before, .crosshair::after {
   content: '';
   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: #FF7474;
 }
 
 /* Horizontal line of crosshair */
 .crosshair::before {
-  top: 10px;
-  left: -7px;
   width: 32px;
   height: 2px;
 }
 
 /* Vertical line of crosshair */
 .crosshair::after {
-  top: -7px;
-  left: 10px;
   width: 2px;
   height: 32px;
 }

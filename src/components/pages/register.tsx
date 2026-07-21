@@ -5,11 +5,10 @@ import styled, { keyframes } from 'styled-components';
 import { faceDataStore } from '../../functions/faceDatastore';
 import { COLORS } from '../../styles/colors';
 
-// --- アニメーション ---
-const pulseGlow = keyframes`
-  0% { border-color: ${COLORS.primary}; box-shadow: 0 0 10px rgba(230, 244, 234, 0.3); }
-  50% { border-color: ${COLORS.accent}; box-shadow: 0 0 18px rgba(255, 116, 116, 0.5); }
-  100% { border-color: ${COLORS.primary}; box-shadow: 0 0 10px rgba(230, 244, 234, 0.3); }
+const pulseBorder = keyframes`
+  0% { border-color: ${COLORS.accent}; }
+  50% { border-color: #1E293B; }
+  100% { border-color: ${COLORS.accent}; }
 `;
 
 const fadeIn = keyframes`
@@ -17,14 +16,13 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-// --- Styled Components ---
 const Container = styled.div`
   position: relative;
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  background-color: #0F172A;
-  color: ${COLORS.primary};
+  background-color: ${COLORS.primary};
+  color: #1E293B;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,22 +46,21 @@ const HeaderTitle = styled.h2`
   font-size: 24px;
   font-weight: 800;
   letter-spacing: 2px;
-  color: ${COLORS.primary};
+  color: #1E293B;
   text-align: center;
 `;
 
 const CardContainer = styled.div`
   position: relative;
   width: 100%;
-  background-color: #1E293B;
-  border: 2px solid #334155;
+  background-color: #FFFFFF;
+  border: 2px solid #1E293B;
   border-radius: 24px;
   padding: 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
   animation: ${fadeIn} 0.3s ease-out;
 `;
 
@@ -75,7 +72,7 @@ const CameraWrapper = styled.div`
   align-items: center;
   overflow: hidden;
   border-radius: 16px;
-  background-color: #0F172A;
+  background-color: #1E293B;
 `;
 
 const StyledVideo = styled.video`
@@ -86,25 +83,24 @@ const StyledVideo = styled.video`
   border-radius: 16px;
 `;
 
-// 縦長（楕円形）ガイドリング
 const OvalGuide = styled.div`
   position: absolute;
   width: 200px;
   height: 260px;
   border-radius: 50%;
-  border: 3px dashed ${COLORS.primary};
-  animation: ${pulseGlow} 2.5s infinite ease-in-out;
+  border: 3px dashed ${COLORS.accent};
+  animation: ${pulseBorder} 2.5s infinite ease-in-out;
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.2);
+  background: rgba(255, 255, 255, 0.15);
 `;
 
 const GuideText = styled.span`
   font-size: 14px;
-  color: ${COLORS.primary};
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  color: #FFFFFF;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
   text-align: center;
   font-weight: 700;
   line-height: 1.4;
@@ -126,16 +122,14 @@ const PrimaryButton = styled.button`
   font-size: 16px;
   font-weight: 700;
   background-color: ${COLORS.accent};
-  color: #0F172A;
+  color: #FFFFFF;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(255, 116, 116, 0.3);
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.15s ease-in-out;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 116, 116, 0.45);
   }
 
   &:active {
@@ -149,15 +143,15 @@ const SecondaryButton = styled.button`
   padding: 12px 20px;
   font-size: 15px;
   font-weight: 600;
-  background-color: #334155;
-  color: ${COLORS.primary};
+  background-color: #E2E8F0;
+  color: #1E293B;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.15s ease-in-out;
 
   &:hover {
-    background-color: #475569;
+    background-color: #CBD5E1;
   }
 
   &:active {
@@ -172,14 +166,14 @@ const OutlineButton = styled.button`
   font-size: 16px;
   font-weight: 700;
   background-color: transparent;
-  color: ${COLORS.primary};
-  border: 2px solid ${COLORS.primary};
+  color: #1E293B;
+  border: 2px solid #1E293B;
   border-radius: 30px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.15s ease-in-out;
 
   &:hover {
-    background-color: rgba(230, 244, 234, 0.1);
+    background-color: rgba(30, 41, 59, 0.05);
   }
 
   &:active {
@@ -205,7 +199,7 @@ const ResultSection = styled.div`
 
 const ResultText = styled.span`
   font-size: 14px;
-  color: ${COLORS.primary};
+  color: #1E293B;
   font-weight: 700;
 `;
 
@@ -214,7 +208,6 @@ const ResultImage = styled.img`
   height: 110px;
   border-radius: 50%;
   border: 3px solid ${COLORS.accent};
-  box-shadow: 0 4px 14px rgba(255, 116, 116, 0.4);
   object-fit: cover;
   margin-top: 8px;
 `;
@@ -309,7 +302,7 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
   return (
     <Container>
       <ContentBox>
-        <HeaderTitle>FACE REGISTRATION</HeaderTitle>
+        <HeaderTitle>顔写真の登録</HeaderTitle>
 
         <CardContainer>
           {!capturedImage ? (

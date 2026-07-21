@@ -1,10 +1,11 @@
 :root {
   --color-primary: #E6F4EA;
   --color-accent: #FF7474;
-  --color-bg: #0F172A;
-  --color-card-bg: #1E293B;
-  --color-text-sub: #94A3B8;
-  --color-border: #334155;
+  --color-bg: #E6F4EA;
+  --color-card-bg: #FFFFFF;
+  --color-text-main: #1E293B;
+  --color-text-sub: #64748B;
+  --color-border: #CBD5E1;
 
   --primary-color: #E6F4EA;
   --accent-color: #FF7474;
@@ -20,7 +21,7 @@
 html, body {
   height: 100%;
   background-color: var(--color-bg);
-  color: var(--color-primary);
+  color: var(--color-text-main);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow: hidden;
   line-height: 1.5;

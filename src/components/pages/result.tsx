@@ -12,11 +12,8 @@ import { COLORS } from "../../styles/colors";
 interface ResultProps {
   setGamestate: (state: string) => void;
   gameResult?: GameResultData;
-  /** 「もう一度遊ぶ」ボタン押下時のコールバック（状態リセット＋遷移） */
   onRetry?: () => void;
-  /** 「タイトルへ」ボタン押下時のコールバック（状態リセット＋遷移） */
   onGoTitle?: () => void;
-  /** ゲーム状態リセット用関数 */
   onReset?: () => void;
 }
 
@@ -28,8 +25,8 @@ const fadeIn = keyframes`
 const Container = styled.div`
   position: fixed;
   inset: 0;
-  background-color: #0F172A;
-  color: ${COLORS.primary};
+  background-color: ${COLORS.primary};
+  color: #1E293B;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -43,11 +40,10 @@ const Container = styled.div`
 const Card = styled.div`
   width: 100%;
   max-width: 480px;
-  background-color: #1E293B;
-  border: 2px solid #334155;
+  background-color: #FFFFFF;
+  border: 2px solid #1E293B;
   border-radius: 24px;
   padding: 28px 20px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,8 +56,7 @@ const HeaderTitle = styled.h1`
   margin: 0;
   font-size: 24px;
   letter-spacing: 3px;
-  text-transform: uppercase;
-  color: ${COLORS.primary};
+  color: #1E293B;
   font-weight: 800;
 `;
 
@@ -81,8 +76,7 @@ const RankBadge = styled.div<{ $isFinished: boolean }>`
   justify-content: center;
   font-size: 48px;
   font-weight: 900;
-  color: #0F172A;
-  box-shadow: 0 6px 20px rgba(255, 116, 116, 0.4);
+  color: #FFFFFF;
   transform: ${(props) => (props.$isFinished ? "scale(1)" : "scale(0.9)")};
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 `;
@@ -91,7 +85,7 @@ const RankLabel = styled.span`
   margin-top: 10px;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.primary};
+  color: #1E293B;
   letter-spacing: 1px;
 `;
 
@@ -101,13 +95,13 @@ const ScoreSection = styled.div`
   align-items: center;
   width: 100%;
   padding: 14px 0;
-  border-top: 1px solid #334155;
-  border-bottom: 1px solid #334155;
+  border-top: 1px solid #CBD5E1;
+  border-bottom: 1px solid #CBD5E1;
 `;
 
 const ScoreSubTitle = styled.span`
   font-size: 12px;
-  color: #94A3B8;
+  color: #64748B;
   letter-spacing: 2px;
   font-weight: 700;
 `;
@@ -129,7 +123,7 @@ const BreakdownContainer = styled.div`
 
 const BreakdownTitle = styled.div`
   font-size: 13px;
-  color: #94A3B8;
+  color: #64748B;
   font-weight: 700;
   letter-spacing: 1px;
 `;
@@ -138,27 +132,27 @@ const BreakdownItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0F172A;
+  background-color: #F8FAFC;
   padding: 12px 16px;
   border-radius: 14px;
-  border: 1px solid #334155;
+  border: 1px solid #CBD5E1;
 `;
 
 const ItemLabel = styled.div`
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.primary};
+  color: #1E293B;
 `;
 
 const ItemSubText = styled.div`
   font-size: 12px;
-  color: #94A3B8;
+  color: #64748B;
 `;
 
 const ItemPoints = styled.div`
   font-size: 16px;
   font-weight: 800;
-  color: ${COLORS.primary};
+  color: #1E293B;
   font-variant-numeric: tabular-nums;
 `;
 
@@ -173,16 +167,16 @@ const SecondaryBtn = styled.button`
   flex: 1;
   padding: 14px;
   border-radius: 30px;
-  border: none;
-  background-color: #334155;
-  color: ${COLORS.primary};
+  border: 2px solid #1E293B;
+  background-color: #FFFFFF;
+  color: #1E293B;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease;
 
   &:hover {
-    background-color: #475569;
+    background-color: #F1F5F9;
   }
 
   &:active {
@@ -196,16 +190,14 @@ const PrimaryBtn = styled.button`
   border-radius: 30px;
   border: none;
   background-color: ${COLORS.accent};
-  color: #0F172A;
+  color: #FFFFFF;
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(255, 116, 116, 0.35);
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 116, 116, 0.5);
   }
 
   &:active {
@@ -213,10 +205,6 @@ const PrimaryBtn = styled.button`
   }
 `;
 
-/**
- * リザルト画面コンポーネント
- * 最終スコアのカウントアップアニメーション、ランク評価、撃破数内訳を表示する
- */
 export const Result: React.FC<ResultProps> = ({
   setGamestate,
   gameResult = { normalKills: 12, bossKills: 2 },
@@ -266,7 +254,7 @@ export const Result: React.FC<ResultProps> = ({
   return (
     <Container>
       <Card>
-        <HeaderTitle>MISSION RESULT</HeaderTitle>
+        <HeaderTitle>ゲーム結果</HeaderTitle>
 
         <RankContainer>
           <RankBadge $isFinished={isAnimationFinished}>
@@ -276,12 +264,12 @@ export const Result: React.FC<ResultProps> = ({
         </RankContainer>
 
         <ScoreSection>
-          <ScoreSubTitle>TOTAL SCORE</ScoreSubTitle>
+          <ScoreSubTitle>最終スコア</ScoreSubTitle>
           <ScoreValue>{displayedScore.toLocaleString()}</ScoreValue>
         </ScoreSection>
 
         <BreakdownContainer>
-          <BreakdownTitle>SCORE BREAKDOWN</BreakdownTitle>
+          <BreakdownTitle>スコア内訳</BreakdownTitle>
 
           <BreakdownItem>
             <div>

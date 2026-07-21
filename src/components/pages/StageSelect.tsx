@@ -14,8 +14,8 @@ const Container = styled.div`
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  background-color: #0F172A;
-  color: ${COLORS.primary};
+  background-color: ${COLORS.primary};
+  color: #1E293B;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,7 +50,7 @@ const HeaderTitle = styled.h2`
   font-size: 26px;
   font-weight: 800;
   letter-spacing: 2px;
-  color: ${COLORS.primary};
+  color: #1E293B;
   text-align: center;
 `;
 
@@ -58,10 +58,10 @@ const RegisteredFaceSection = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #1E293B;
+  background-color: #FFFFFF;
   padding: 8px 16px;
   border-radius: 30px;
-  border: 1px solid #334155;
+  border: 1px solid #1E293B;
   animation: ${fadeIn} 0.3s ease-out;
 `;
 
@@ -75,7 +75,7 @@ const FacePreview = styled.img`
 
 const RegisteredText = styled.span`
   font-size: 13px;
-  color: ${COLORS.primary};
+  color: #1E293B;
   font-weight: 700;
 `;
 
@@ -94,11 +94,11 @@ const CardContainer = styled.div`
     width: 6px;
   }
   &::-webkit-scrollbar-track {
-    background: #1E293B;
+    background: #E2E8F0;
     border-radius: 4px;
   }
   &::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #CBD5E1;
     border-radius: 4px;
   }
 `;
@@ -106,21 +106,19 @@ const CardContainer = styled.div`
 const StageCard = styled.div`
   box-sizing: border-box;
   width: 100%;
-  background-color: #1E293B;
-  border: 2px solid #334155;
+  background-color: #FFFFFF;
+  border: 2px solid #1E293B;
   border-radius: 20px;
   padding: 18px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.15s ease-in-out;
 
   &:hover, &:active {
     border-color: ${COLORS.accent};
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(255, 116, 116, 0.25);
   }
 `;
 
@@ -135,12 +133,12 @@ const StageTitle = styled.h3`
   font-size: 22px;
   font-weight: 800;
   letter-spacing: 1px;
-  color: ${COLORS.primary};
+  color: #1E293B;
 `;
 
 const StageSubText = styled.span`
   font-size: 12px;
-  color: #94A3B8;
+  color: #64748B;
   font-weight: 600;
 `;
 
@@ -149,12 +147,11 @@ const SelectButton = styled.button`
   font-size: 15px;
   font-weight: 800;
   background-color: ${COLORS.accent};
-  color: #0F172A;
+  color: #FFFFFF;
   border: none;
   border-radius: 24px;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(255, 116, 116, 0.3);
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.15s ease-in-out;
 
   ${StageCard}:hover & {
     transform: scale(1.04);
@@ -173,15 +170,15 @@ const BackButton = styled.button`
   padding: 14px 20px;
   font-size: 15px;
   font-weight: 700;
-  background-color: #334155;
-  color: ${COLORS.primary};
-  border: none;
+  background-color: #FFFFFF;
+  color: #1E293B;
+  border: 2px solid #1E293B;
   border-radius: 30px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.15s ease-in-out;
 
   &:hover {
-    background-color: #475569;
+    background-color: rgba(30, 41, 59, 0.05);
   }
 
   &:active {
@@ -207,7 +204,7 @@ export const StageSelect = ({ setGamestate, setStageNum }: StageSelectProps) => 
     <Container>
       <ContentBox>
         <HeaderSection>
-          <HeaderTitle>SELECT STAGE</HeaderTitle>
+          <HeaderTitle>ステージ選択</HeaderTitle>
 
           {croppedFaceUrl && (
             <RegisteredFaceSection>
@@ -224,11 +221,11 @@ export const StageSelect = ({ setGamestate, setStageNum }: StageSelectProps) => 
               onClick={() => handleSelectStage(stage.stageNum)}
             >
               <StageInfoGroup>
-                <StageTitle>STAGE {stage.stageNum}</StageTitle>
-                <StageSubText>Target: Enemies</StageSubText>
+                <StageTitle>ステージ {stage.stageNum}</StageTitle>
+                <StageSubText>ターゲット：敵ロボット</StageSubText>
               </StageInfoGroup>
               <SelectButton>
-                PLAY
+                プレイ
               </SelectButton>
             </StageCard>
           ))}
