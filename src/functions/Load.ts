@@ -62,3 +62,35 @@ export const loadStageInfo = (stageNum: number): JsonInfo | null => {
     enemies: enemies,
   };
 };
+
+export interface StageSummary {
+  stageNum: number;
+  waves: number;
+  limitTime: number;
+  name?: string;
+  description?: string;
+}
+
+/**
+ * StageInfo.jsonに存在するすべてのステージの概要情報を取得します。
+ * @returns ステージ番号順にソートされたステージ情報の配列
+ */
+export const getAvailableStages = (): StageSummary[] => {
+  const data = stageInfoData as unknown as RawStageDataCollection;
+  return Object.keys(data)
+    .map((key) => parseInt(key, 10))
+    .filter((num) => !isNaN(num))
+    .sort((a, b) => a - b)
+    .map((stageNum) => {
+      const raw = data[stageNum.toString()];
+      const extendedRaw = raw as RawStageInfo & { name?: string; description?: string };
+      return {
+        stageNum,
+        waves: raw?.waves ?? 1,
+        limitTime: raw?.LimitTime ?? 60,
+        name: extendedRaw?.name,
+        description: extendedRaw?.description,
+      };
+    });
+};
+
