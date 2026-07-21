@@ -189,6 +189,18 @@ const CropWrapper = styled.div`
   width: 100%;
 `;
 
+const CaptureButton = styled(PrimaryButton)`
+  position: absolute;
+  bottom: 16px;
+  z-index: 10;
+  width: calc(100% - 32px);
+`;
+
+const CropImage = styled.img`
+  max-height: 340px;
+  border-radius: 12px;
+`;
+
 const ResultSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -316,21 +328,17 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
                 </GuideText>
               </OvalGuide>
 
-              <PrimaryButton
-                onClick={handleCapture}
-                style={{ position: 'absolute', bottom: '16px', zIndex: 10, width: 'calc(100% - 32px)' }}
-              >
+              <CaptureButton onClick={handleCapture}>
                 写真を撮影
-              </PrimaryButton>
+              </CaptureButton>
             </CameraWrapper>
           ) : (
             <CropWrapper>
               <ReactCrop crop={crop} onChange={setCrop} aspect={0.75} circularCrop keepSelection>
-                <img
+                <CropImage
                   ref={imgRef}
                   src={capturedImage}
                   alt="撮影顔写真"
-                  style={{ maxHeight: '340px', borderRadius: '12px' }}
                 />
               </ReactCrop>
 

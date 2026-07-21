@@ -5,8 +5,10 @@ import { useFrame } from "@react-three/fiber";
 import { Clone, useGLTF, useAnimations } from "@react-three/drei";
 import { SpawnWave } from "./SpawnWave";
 import { faceDataStore } from "../../functions/faceDatastore";
+import { enemyRegistry } from "../../functions/enemyRegistry";
 
 export interface EnemyInfo{
+    id?: string
     type:string
     position:THREE.Vector3
     Movement:string[] // stringの配列 (例: ["tate", "nori"])
@@ -268,6 +270,30 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
     const groupRef = useRef<any>(null);
     const rigidBodyRef = useRef<RapierRigidBody>(null);
 
+    // 画面外矢印インジケーター用の固有IDを保持
+    const enemyIdRef = useRef<string>(info.id || `enemy_${Math.random().toString(36).substring(2, 9)}`);
+
+    useEffect(() => {
+        const id = enemyIdRef.current;
+        enemyRegistry.register({
+            id,
+            type: info.type,
+            getPosition: () => {
+                if (isdefeated || !rigidBodyRef.current) return null;
+                try {
+                    const translation = rigidBodyRef.current.translation();
+                    return new THREE.Vector3(translation.x, translation.y, translation.z);
+                } catch {
+                    return null;
+                }
+            },
+        });
+
+        return () => {
+            enemyRegistry.unregister(id);
+        };
+    }, [info.type, isdefeated]);
+
     // プリロードされたモデルデータを取得
     const normalGltf = useGLTF('/gld/enemy_a.glb');
     
@@ -372,6 +398,7 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
     return (
         <RigidBody
             ref={rigidBodyRef}
+            name={isBoss ? "boss" : "enemy"}
             colliders="ball"
             restitution={0.01}
             gravityScale={isdefeated ? 1 : 0}

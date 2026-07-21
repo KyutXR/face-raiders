@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import {
-  calculateTotalScore,
-  getRankInfo,
-  SCORE_PER_BOSS_KILL,
-  SCORE_PER_NORMAL_KILL,
-} from "../../functions/score";
+import { calculateTotalScore } from "../../functions/score";
 import type { GameResultData } from "../../functions/score";
 import { COLORS } from "../../styles/colors";
 
@@ -39,17 +34,18 @@ const Container = styled.div`
 
 const Card = styled.div`
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   background-color: #FFFFFF;
   border: 2px solid #1E293B;
   border-radius: 24px;
-  padding: 28px 20px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   box-sizing: border-box;
   animation: ${fadeIn} 0.3s ease-out;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 `;
 
 const HeaderTitle = styled.h1`
@@ -60,72 +56,57 @@ const HeaderTitle = styled.h1`
   font-weight: 800;
 `;
 
-const RankContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const RankBadge = styled.div<{ $isFinished: boolean }>`
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  background-color: ${COLORS.accent};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  font-weight: 900;
-  color: #FFFFFF;
-  transform: ${(props) => (props.$isFinished ? "scale(1)" : "scale(0.9)")};
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-`;
-
-const RankLabel = styled.span`
-  margin-top: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #1E293B;
-  letter-spacing: 1px;
-`;
-
 const ScoreSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 14px 0;
-  border-top: 1px solid #CBD5E1;
-  border-bottom: 1px solid #CBD5E1;
+  padding: 18px 0;
+  background-color: #F8FAFC;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
 `;
 
 const ScoreSubTitle = styled.span`
-  font-size: 12px;
+  font-size: 13px;
   color: #64748B;
   letter-spacing: 2px;
   font-weight: 700;
 `;
 
 const ScoreValue = styled.span`
-  font-size: 40px;
-  font-weight: 800;
+  font-size: 44px;
+  font-weight: 900;
   color: ${COLORS.accent};
   font-variant-numeric: tabular-nums;
-  margin-top: 2px;
+  margin-top: 4px;
+  line-height: 1;
 `;
 
 const BreakdownContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+`;
+
+const BreakdownHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 `;
 
 const BreakdownTitle = styled.div`
-  font-size: 13px;
+  font-size: 14px;
   color: #64748B;
   font-weight: 700;
   letter-spacing: 1px;
+`;
+
+const TotalKills = styled.div`
+  font-size: 16px;
+  font-weight: 800;
+  color: #1E293B;
 `;
 
 const BreakdownItem = styled.div`
@@ -133,7 +114,7 @@ const BreakdownItem = styled.div`
   justify-content: space-between;
   align-items: center;
   background-color: #F8FAFC;
-  padding: 12px 16px;
+  padding: 14px 18px;
   border-radius: 14px;
   border: 1px solid #CBD5E1;
 `;
@@ -144,13 +125,8 @@ const ItemLabel = styled.div`
   color: #1E293B;
 `;
 
-const ItemSubText = styled.div`
-  font-size: 12px;
-  color: #64748B;
-`;
-
-const ItemPoints = styled.div`
-  font-size: 16px;
+const ItemCount = styled.div`
+  font-size: 18px;
   font-weight: 800;
   color: #1E293B;
   font-variant-numeric: tabular-nums;
@@ -160,7 +136,7 @@ const ButtonGroup = styled.div`
   display: flex;
   gap: 12px;
   width: 100%;
-  margin-top: 6px;
+  margin-top: 4px;
 `;
 
 const SecondaryBtn = styled.button`
@@ -173,7 +149,7 @@ const SecondaryBtn = styled.button`
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, background-color 0.15s ease;
 
   &:hover {
     background-color: #F1F5F9;
@@ -213,10 +189,7 @@ export const Result: React.FC<ResultProps> = ({
   onReset,
 }) => {
   const targetTotalScore = calculateTotalScore(gameResult);
-  const rankInfo = getRankInfo(targetTotalScore);
-
   const [displayedScore, setDisplayedScore] = useState<number>(0);
-  const [isAnimationFinished, setIsAnimationFinished] = useState<boolean>(false);
 
   useEffect(() => {
     let animationFrameId: number;
@@ -235,7 +208,6 @@ export const Result: React.FC<ResultProps> = ({
         animationFrameId = requestAnimationFrame(animateScore);
       } else {
         setDisplayedScore(targetTotalScore);
-        setIsAnimationFinished(true);
       }
     };
 
@@ -248,20 +220,12 @@ export const Result: React.FC<ResultProps> = ({
     };
   }, [targetTotalScore]);
 
-  const normalScore = gameResult.normalKills * SCORE_PER_NORMAL_KILL;
-  const bossScore = gameResult.bossKills * SCORE_PER_BOSS_KILL;
+  const totalKills = gameResult.normalKills + gameResult.bossKills;
 
   return (
     <Container>
       <Card>
         <HeaderTitle>ゲーム結果</HeaderTitle>
-
-        <RankContainer>
-          <RankBadge $isFinished={isAnimationFinished}>
-            {rankInfo.rank}
-          </RankBadge>
-          <RankLabel>{rankInfo.label}</RankLabel>
-        </RankContainer>
 
         <ScoreSection>
           <ScoreSubTitle>最終スコア</ScoreSubTitle>
@@ -269,26 +233,19 @@ export const Result: React.FC<ResultProps> = ({
         </ScoreSection>
 
         <BreakdownContainer>
-          <BreakdownTitle>スコア内訳</BreakdownTitle>
+          <BreakdownHeader>
+            <BreakdownTitle>倒した敵の数</BreakdownTitle>
+            <TotalKills>合計 {totalKills} 体</TotalKills>
+          </BreakdownHeader>
 
           <BreakdownItem>
-            <div>
-              <ItemLabel>ノーマル敵 撃破</ItemLabel>
-              <ItemSubText>
-                {gameResult.normalKills} 体 × {SCORE_PER_NORMAL_KILL.toLocaleString()} pt
-              </ItemSubText>
-            </div>
-            <ItemPoints>+{normalScore.toLocaleString()}</ItemPoints>
+            <ItemLabel>ノーマル敵</ItemLabel>
+            <ItemCount>{gameResult.normalKills} 体</ItemCount>
           </BreakdownItem>
 
           <BreakdownItem>
-            <div>
-              <ItemLabel>ボス敵 撃破</ItemLabel>
-              <ItemSubText>
-                {gameResult.bossKills} 体 × {SCORE_PER_BOSS_KILL.toLocaleString()} pt
-              </ItemSubText>
-            </div>
-            <ItemPoints>+{bossScore.toLocaleString()}</ItemPoints>
+            <ItemLabel>ボス敵</ItemLabel>
+            <ItemCount>{gameResult.bossKills} 体</ItemCount>
           </BreakdownItem>
         </BreakdownContainer>
 
@@ -323,3 +280,4 @@ export const Result: React.FC<ResultProps> = ({
     </Container>
   );
 };
+

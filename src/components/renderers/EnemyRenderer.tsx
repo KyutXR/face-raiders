@@ -4,6 +4,7 @@ import { EnemyBullet, type EnemyBulletInfo } from "../objects/EnemyBullet";
 import { loadStageInfo } from "../../functions/Load";
 import type { GameResultData } from "../../functions/score";
 import type * as THREE from "three";
+import { playEnemyDefeatSound, playEnemyShootSound } from "../../utils/sound";
 
 interface Props {
     stage: number;
@@ -42,6 +43,9 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult, onPlayerDama
 
     // 敵から弾が発射されたときのハンドラ
     const handleShootBullet = (startPos: THREE.Vector3, direction: THREE.Vector3) => {
+        // 敵弾発射音を再生
+        playEnemyShootSound();
+
         const newBullet: EnemyBulletInfo = {
             id: Math.random().toString(36).substring(2, 9),
             startPosition: startPos.clone(),
@@ -134,6 +138,9 @@ export const Enemyrenderer = ({ stage, setGamestate, setGameResult, onPlayerDama
     // 敵が自弾で撃破された時に呼び出されるコールバック
     const handleEnemyDefeat = (enemy: EnemyInfo) => {
         if (!exitedSet.current.has(enemy)) {
+            // 撃破音を再生
+            playEnemyDefeatSound();
+
             exitedSet.current.add(enemy);
             if (setGameResult) {
                 setGameResult((prev) => {
