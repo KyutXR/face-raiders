@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Clone, useGLTF, useAnimations } from "@react-three/drei";
 import { SpawnWave } from "./SpawnWave";
+import { faceDataStore } from "../../functions/faceDatastore";
 
 export interface EnemyInfo{
     type:string
@@ -17,6 +18,35 @@ export interface EnemyInfo{
 useGLTF.preload('/gld/enemy_a.glb');
 
 /**
+ * 敵キャラクターの正面に登録・切り抜かれた顔テクスチャを貼り付けて表示するコンポーネント
+ */
+export const EnemyFaceMesh = () => {
+    const [faceTexture, setFaceTexture] = useState<THREE.Texture | null>(faceDataStore.croppedFaceTexture);
+
+    // テクスチャの非同期ロード・更新を監視
+    useFrame(() => {
+        if (faceDataStore.croppedFaceTexture && faceTexture !== faceDataStore.croppedFaceTexture) {
+            setFaceTexture(faceDataStore.croppedFaceTexture);
+        }
+    });
+
+    if (!faceTexture) return null;
+
+    return (
+        <mesh position={[0, 0.1, 0.45]} rotation={[0, 0, 0]}>
+            {/* 切り抜き画像を貼り付ける円形メッシュ */}
+            <circleGeometry args={[0.5, 32]} />
+            <meshBasicMaterial 
+                map={faceTexture} 
+                transparent={true} 
+                depthWrite={false}
+                side={THREE.DoubleSide} 
+            />
+        </mesh>
+    );
+};
+
+/**
  * 敵キャラクターのアニメーションを再生・制御するカスタムフック（別定義の関数）
  * @param animations GLTFモデルに含まれるアニメーションクリップの配列
  * @param groupRef アニメーションをバインドするグループコンポーネントのRef
@@ -24,7 +54,6 @@ useGLTF.preload('/gld/enemy_a.glb');
  * @param movement 動作アニメーションの指定配列 (例: ["tate", "nori"])
  * @param isRushing 突進中かどうかのフラグ
  */
-// アニメーション間のクールタイム（ミリ秒）。傾き(nori)等の姿勢が次の再生に混ざるのを防ぐ緩衝時間
 const ANIMATION_COOLDOWN_MS = 400;
 
 export const useEnemyAnimation = (
@@ -38,15 +67,13 @@ export const useEnemyAnimation = (
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isCoolingDown, setIsCoolingDown] = useState(false);
 
-    // ★ movement配列の各要素と「完全一致」するNLAトラック(クリップ名)だけを、配列の順番通りに抽出する。
-    //    部分一致(includes)をやめることで、nori等の別アニメーションが誤発動するのを防ぐ。
     const sequence = useMemo<string[]>(() => {
         if (!movement || movement.length === 0 || names.length === 0) return [];
 
         const resolved: string[] = [];
         movement.forEach((tag) => {
             const target = (tag || "").toLowerCase().trim();
-            if (!target || target === "rush") return; // rushは移動用タグなのでアニメ抽出対象外
+            if (!target || target === "rush") return;
             const match = names.find((name) => name.toLowerCase().trim() === target);
             if (match) {
                 resolved.push(match);
@@ -60,27 +87,23 @@ export const useEnemyAnimation = (
         return resolved;
     }, [movement, names]);
 
-    // シーケンスの中身が変わったら先頭から再生し直す
     const sequenceKey = sequence.join("|");
     useEffect(() => {
         setCurrentIndex(0);
         setIsCoolingDown(false);
     }, [sequenceKey]);
 
-    // 現在の順番で再生すべきアニメーション名（クールタイム中・突進中・撃破時はnull）
     const activeName =
         !isDefeated && !isRushing && !isCoolingDown && sequence.length > 0
             ? sequence[currentIndex % sequence.length]
             : null;
 
-    // アニメーション完了(finished)を監視し、クールタイムを挟んで次の要素へ進める
     useEffect(() => {
         if (!mixer || sequence.length === 0) return;
 
         let timer: number | null = null;
 
         const handleFinished = (e: any) => {
-            // ★ 今まさに再生中のクリップが終わったときだけ次へ進める（他アニメの終了では進めない）
             const finishedName: string | undefined = e?.action?.getClip?.()?.name;
             const expected = sequence[currentIndex % sequence.length];
             if (!finishedName || finishedName !== expected) return;
@@ -99,7 +122,6 @@ export const useEnemyAnimation = (
         };
     }, [mixer, sequenceKey, currentIndex]);
 
-    // 実際のアクション適用：現在の順番のアニメだけを再生し、それ以外は必ず停止して姿勢の混入を防ぐ
     useEffect(() => {
         if (names.length === 0 || !actions) return;
 
@@ -110,7 +132,6 @@ export const useEnemyAnimation = (
             const isPropeller = name.toLowerCase().includes("propeller");
 
             if (isPropeller && !isDefeated) {
-                // プロペラ等の常時ループアニメは動作シーケンスとは独立して回し続ける
                 action.setLoop(THREE.LoopRepeat, Infinity);
                 action.clampWhenFinished = false;
                 if (!action.isRunning()) {
@@ -118,18 +139,16 @@ export const useEnemyAnimation = (
                 }
             } else if (name === activeName) {
                 action.setLoop(THREE.LoopOnce, 1);
-                action.clampWhenFinished = false; // 終了時に姿勢を保持せずレストポーズへ戻す
+                action.clampWhenFinished = false;
                 if (!action.isRunning()) {
                     action.reset().fadeIn(0.2).play();
                 }
             } else {
-                // 対象外・順番待ち・クールタイム中・撃破時はストップしてボーン変形(傾き等)をクリア
                 action.stop();
             }
         });
     }, [actions, names, sequenceKey, currentIndex, isDefeated, isRushing, isCoolingDown, activeName]);
 
-    // アンマウント時（またはアクション差し替え時）に全アニメを停止
     useEffect(() => {
         return () => {
             if (!actions) return;
@@ -171,7 +190,6 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
     const selectedGltf = isBoss ? bossGltf : normalGltf;
     const scaleFactor = isBoss ? 2.5 : 1.0;
 
-    // ★ アニメーションデータが敵インスタンス間で共有されて右斜め等の姿勢干渉・汚染が起きるのを防ぐため、個別にクローンして独立させます
     const clonedAnimations = useMemo(() => {
         return selectedGltf.animations.map((clip) => clip.clone());
     }, [selectedGltf.animations]);
@@ -216,7 +234,7 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
             }
         }
 
-        // 4. ★ ユーザー指示に基づき、元の完全な lookAt(camera.position) に復元
+        // 4. カメラの方向へ顔を向ける
         if (groupRef.current && camera) {
             try {
                 groupRef.current.updateMatrixWorld(true);
@@ -246,6 +264,8 @@ export const Enemy = ({ info, onDefeat }: { info: EnemyInfo; onDefeat?: (enemy: 
                     scale={[scaleFactor, scaleFactor, scaleFactor]} 
                     rotation={[0, 0, 0]} 
                 />
+                {/* ★ 切り抜かれた顔テクスチャを貼り付けたメッシュ */}
+                <EnemyFaceMesh />
             </group>
         </RigidBody>
     );

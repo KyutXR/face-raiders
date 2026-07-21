@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.35",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@react-three/rapier": "^2.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-image-crop": "^11.1.2",
     "styled-components": "^6.4.3",
     "three": "^0.185.1"
   },
