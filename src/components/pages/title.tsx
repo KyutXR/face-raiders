@@ -27,9 +27,16 @@ const ContentContainer = styled.div`
   box-sizing: border-box;
 `;
 
+const LogoWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Logo = styled.img`
-  width: 85%;
-  max-width: 380px;
+  width: 140%;
+  max-width: 600px;
   height: auto;
 `;
 
@@ -60,7 +67,9 @@ export const Title = ({ setGamestate }: { setGamestate: (state: string) => void 
   return (
     <TitleWrapper>
       <ContentContainer>
-        <Logo src="/logo.svg" alt="顔 raiders" />
+        <LogoWrapper>
+          <Logo src="/logo.svg" alt="顔 raiders" />
+        </LogoWrapper>
         <StartButton onClick={() => setGamestate("register")}>
           ゲームスタート
         </StartButton>
