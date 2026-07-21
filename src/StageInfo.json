@@ -40,14 +40,14 @@
   },
   "3": {
     "waves": 1,
-    "LimitTime": 120,
+    "LimitTime": 180,
     "enemies": [
       [
         {
           "EmergeTime": 1,
           "LeaveTime": 13,
           "type": "normal",
-          "position": [3, 2, -10],
+          "position": [5, 4, 1],
           "Movement": ["nori","tate","kaiten_up"]
         }
       ],
@@ -56,17 +56,341 @@
           "EmergeTime": 2,
           "LeaveTime": 12,
           "type": "boss",
-          "position": [0, 5, -15],
+          "position": [0, -7, -5],
+          "Movement": ["yoko","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 6,
+          "LeaveTime": 18,
+          "type": "normal",
+          "position": [10, -5, 7],
+          "Movement": ["yoko","tate"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 8,
+          "LeaveTime": 13,
+          "type": "normal",
+          "position": [5, 4, 1],
+          "Movement": ["nori","tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 9,
+          "LeaveTime": 25,
+          "type": "normal",
+          "position": [0, 3, -8],
+          "Movement": ["nori","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 14,
+          "LeaveTime": 30,
+          "type": "normal",
+          "position": [1, 1, 2],
           "Movement": ["yoko"]
         }
       ],
       [
         {
-          "EmergeTime": 3,
-          "LeaveTime": 15,
+          "EmergeTime": 16,
+          "LeaveTime": 29,
+          "type": "normal",
+          "position": [5, 4, 1],
+          "Movement": ["nori","tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 18,
+          "LeaveTime": 32,
           "type": "normal",
           "position": [1, 1, -12],
-          "Movement": ["yoko"]
+          "Movement": ["yoko","tate","kaiten_up","nori"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 19,
+          "LeaveTime": 36,
+          "type": "normal",
+          "position": [5, 4, 1],
+          "Movement": ["nori","tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 30,
+          "LeaveTime": 40,
+          "type": "normal",
+          "position": [20, 1, -1],
+          "Movement": ["nori","tate","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 35,
+          "LeaveTime": 43,
+          "type": "normal",
+          "position": [5, 0, -3],
+          "Movement": ["tate"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 35,
+          "LeaveTime": 43,
+          "type": "normal",
+          "position": [3, -4, 1],
+          "Movement": ["kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 35,
+          "LeaveTime": 43,
+          "type": "normal",
+          "position": [0, 2, 10],
+          "Movement": ["nori","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 39,
+          "LeaveTime": 55,
+          "type": "normal",
+          "position": [-5, -4, 1],
+          "Movement": ["tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 46,
+          "LeaveTime": 60,
+          "type": "normal",
+          "position": [15, 2, -7],
+          "Movement": ["kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 46,
+          "LeaveTime": 60,
+          "type": "normal",
+          "position": [10, -3, 4],
+          "Movement": ["nori","tate"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 46,
+          "LeaveTime": 60,
+          "type": "normal",
+          "position": [5, 1, -2],
+          "Movement": ["nori","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 46,
+          "LeaveTime": 60,
+          "type": "normal",
+          "position": [-2, -9, 5],
+          "Movement": ["nori","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 46,
+          "LeaveTime": 60,
+          "type": "normal",
+          "position": [-7, 6, -3],
+          "Movement": ["tate","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 63,
+          "LeaveTime": 70,
+          "type": "normal",
+          "position": [0, 2, 0],
+          "Movement": ["nori","yoko","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 68,
+          "LeaveTime": 75,
+          "type": "boss",
+          "position": [5, 4, 1],
+          "Movement": ["nori","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 70,
+          "LeaveTime": 78,
+          "type": "normal",
+          "position": [6, -8, -10],
+          "Movement": ["nori","tate","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 80,
+          "LeaveTime": 87,
+          "type": "normal",
+          "position": [5, 0, 0],
+          "Movement": ["nori","tate"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 80,
+          "LeaveTime": 87,
+          "type": "normal",
+          "position": [0, 0, 0],
+          "Movement": ["nori","tate"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 80,
+          "LeaveTime": 87,
+          "type": "normal",
+          "position": [-5, 0, 0],
+          "Movement": ["nori","tate"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 88,
+          "LeaveTime": 98,
+          "type": "normal",
+          "position": [0, 7, 7],
+          "Movement": ["nori","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 88,
+          "LeaveTime": 98,
+          "type": "normal",
+          "position": [0, 0, 0],
+          "Movement": ["nori","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 88,
+          "LeaveTime": 98,
+          "type": "normal",
+          "position": [-7, -7, 0],
+          "Movement": ["nori","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 98,
+          "LeaveTime": 105,
+          "type": "normal",
+          "position": [2, 5, 5],
+          "Movement": ["kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 99,
+          "LeaveTime": 106,
+          "type": "normal",
+          "position": [2, 5, 5],
+          "Movement": ["kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 100,
+          "LeaveTime": 107,
+          "type": "normal",
+          "position": [2, 5, 5],
+          "Movement": ["kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 110,
+          "LeaveTime": 125,
+          "type": "normal",
+          "position": [0, -7, 3],
+          "Movement": ["nori","tate","kaiten_up","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 120,
+          "LeaveTime": 135,
+          "type": "normal",
+          "position": [8, 8, -2],
+          "Movement": ["nori","yoko","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 130,
+          "LeaveTime": 145,
+          "type": "normal",
+          "position": [4, 3, 2],
+          "Movement": ["nori","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 140,
+          "LeaveTime": 155,
+          "type": "normal",
+          "position": [-7, -4, 5],
+          "Movement": ["nori","tate","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 150,
+          "LeaveTime": 165,
+          "type": "normal",
+          "position": [5, 5, 5],
+          "Movement": ["nori","tate","kaiten_up","yoko"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 153,
+          "LeaveTime": 168,
+          "type": "normal",
+          "position": [5, 5, -5],
+          "Movement": ["nori","yoko","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 161,
+          "LeaveTime": 173,
+          "type": "normal",
+          "position": [5, -5, 5],
+          "Movement": ["tate","yoko","kaiten_up"]
+        }
+      ],
+      [
+        {
+          "EmergeTime": 170,
+          "LeaveTime": 178,
+          "type": "normal",
+          "position": [0, 0, 0],
+          "Movement": ["nori","right_up","kaiten_up","yoko"]
         }
       ]
     ]
