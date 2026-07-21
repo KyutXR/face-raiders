@@ -225,7 +225,7 @@ const ResultImage = styled.img`
 `;
 
 export const Register = ({ setGamestate }: { setGamestate: (state: string) => void }) => {
-  const [, setCameraStream] = useState<MediaStream | null>(null);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   // 縦長（3:4アスペクト比）の初期クロップ枠
@@ -242,9 +242,6 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
       .then((s) => {
         stream = s;
         setCameraStream(s);
-        if (videoRef.current) {
-          videoRef.current.srcObject = s;
-        }
       })
       .catch((err) => console.error("内カメラ起動エラー:", err));
 
@@ -254,6 +251,13 @@ export const Register = ({ setGamestate }: { setGamestate: (state: string) => vo
       }
     };
   }, []);
+
+  // ビデオ要素がマウントされた際、または撮り直し時にストリームを再設定
+  useEffect(() => {
+    if (videoRef.current && cameraStream && !capturedImage) {
+      videoRef.current.srcObject = cameraStream;
+    }
+  }, [cameraStream, capturedImage]);
 
   // カメラ映像から顔のスナップショットを撮影
   const handleCapture = () => {

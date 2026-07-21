@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
-import { RigidBody, type RapierRigidBody } from '@react-three/rapier';
+import { RigidBody, type RapierRigidBody, type CollisionPayload } from '@react-three/rapier';
 import { ScorePopup } from './ScorePopup';
 import { HitParticles } from './HitParticles';
+import { SCORE_PER_NORMAL_KILL, SCORE_PER_BOSS_KILL } from '../../functions/score';
 
 export interface Bulletinfo {
     current_position: Vector3;
@@ -15,7 +16,9 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const [active, setActive] = useState(true);
   const [isIntersect, setIsIntersect] = useState(false);
+  const [hitPos, setHitPos] = useState<Vector3 | null>(null);
   const [scorePos, setScorePos] = useState<Vector3 | null>(null);
+  const [scoreAmount, setScoreAmount] = useState<number | undefined>(undefined);
   const lifetimeRef = useRef(Lifetime);
   
   // 弾の飛行速度 (秒速 30 ユニット)
@@ -43,15 +46,23 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
     }
   });
 
-  const handleCollision = () => {
+  const handleCollision = (event: CollisionPayload) => {
     if (!isIntersect) {
+      const otherName = event?.other?.rigidBodyObject?.name;
+      const isEnemy = otherName === 'enemy' || otherName === 'boss';
+
       // 物理エンジンのロックを避けるため、状態更新と物理操作を遅延させる
       setTimeout(() => {
         setIsIntersect(true);
         if (rigidBodyRef.current) {
           try {
             const translation = rigidBodyRef.current.translation();
-            setScorePos(new Vector3(translation.x, translation.y, translation.z));
+            const pos = new Vector3(translation.x, translation.y, translation.z);
+            setHitPos(pos);
+            if (isEnemy) {
+              setScorePos(pos);
+              setScoreAmount(otherName === 'boss' ? SCORE_PER_BOSS_KILL : SCORE_PER_NORMAL_KILL);
+            }
             rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
           } catch (e) {
             console.error("Error updating bullet physics on collision:", e);
@@ -84,11 +95,11 @@ export const Bullet = ({ current_position, direction, Lifetime }: Bulletinfo) =>
         </mesh>
       </RigidBody>
       
-      {/* 衝突時にスコアポップアップをレンダリング */}
-      {isIntersect && scorePos && <ScorePopup position={scorePos} />}
+      {/* 敵に衝突した時のみスコアポップアップをレンダリング */}
+      {isIntersect && scorePos && <ScorePopup position={scorePos} score={scoreAmount} />}
 
       {/* 衝突時に火花パーティクルをレンダリング */}
-      {isIntersect && scorePos && <HitParticles position={scorePos} />}
+      {isIntersect && hitPos && <HitParticles position={hitPos} />}
     </>
   );
 }

@@ -14,6 +14,7 @@ export interface EnemyInfo{
     Movement:string[] // stringの配列 (例: ["tate", "nori"])
     EmergeTime:number // 出現時間
     LeaveTime:number  // 消去時間
+    Speed?: number;
 }
 
 // 敵のモデルアセットを事前にプリロード（マウント時のガクつきを防止）
@@ -104,11 +105,23 @@ export const useEnemyAnimation = (
     groupRef: React.RefObject<any>,
     isDefeated: boolean,
     movement: string[],
-    isRushing: boolean
+    isRushing: boolean,
+    rigidBodyRef?: React.RefObject<RapierRigidBody | null>
 ) => {
     const { actions, names, mixer } = useAnimations(animations, groupRef);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isCoolingDown, setIsCoolingDown] = useState(false);
+    const initialLocalPosRef = useRef<THREE.Vector3 | null>(null);
+
+    // アニメーション適用前の初期ローカル位置（レストポーズ）をあらかじめキャプチャ
+    useEffect(() => {
+        if (groupRef.current && !initialLocalPosRef.current) {
+            const targetNode = findTargetNode(groupRef.current);
+            if (targetNode) {
+                initialLocalPosRef.current = targetNode.position.clone();
+            }
+        }
+    }, [groupRef.current]);
 
     const sequence = useMemo<string[]>(() => {
         if (!movement || movement.length === 0 || names.length === 0) return [];
@@ -151,6 +164,41 @@ export const useEnemyAnimation = (
             const expected = sequence[currentIndex % sequence.length];
             if (!finishedName || finishedName !== expected) return;
 
+            // アニメーション終了直後の移動後座標をRigidBodyに反映し、元の位置に戻らず維持する処理
+            if (groupRef.current && rigidBodyRef?.current) {
+                try {
+                    groupRef.current.updateMatrixWorld(true);
+                    const targetNode = findTargetNode(groupRef.current) || groupRef.current;
+
+                    const initialLocalPos = initialLocalPosRef.current || targetNode.position.clone();
+
+                    // 1. アニメーション終了直後のターゲットノードのワールド座標
+                    const currentWorldPos = new THREE.Vector3();
+                    targetNode.getWorldPosition(currentWorldPos);
+
+                    // 2. 初期ローカル位置（レストポーズ）におけるターゲットノードのワールド座標
+                    const restWorldPos = groupRef.current.localToWorld(initialLocalPos.clone());
+
+                    // 3. アニメーションによるワールド空間上の相対移動量（デルタ）
+                    const deltaWorld = new THREE.Vector3().subVectors(currentWorldPos, restWorldPos);
+
+                    // 4. RigidBodyの物理座標を移動量分だけ更新
+                    const currentTranslation = rigidBodyRef.current.translation();
+                    const newPos = new THREE.Vector3(
+                        currentTranslation.x + deltaWorld.x,
+                        currentTranslation.y + deltaWorld.y,
+                        currentTranslation.z + deltaWorld.z
+                    );
+                    rigidBodyRef.current.setTranslation(newPos, true);
+
+                    // 5. ターゲットノードのローカル位置を初期ローカル位置にリセット
+                    targetNode.position.copy(initialLocalPos);
+                    targetNode.updateMatrixWorld(true);
+                } catch (err) {
+                    console.error("[Enemy] Error applying post-animation position:", err);
+                }
+            }
+
             setIsCoolingDown(true);
             timer = window.setTimeout(() => {
                 setCurrentIndex((prev) => (prev + 1) % sequence.length);
@@ -163,10 +211,18 @@ export const useEnemyAnimation = (
             mixer.removeEventListener("finished", handleFinished);
             if (timer) clearTimeout(timer);
         };
-    }, [mixer, sequenceKey, currentIndex]);
+    }, [mixer, sequenceKey, currentIndex, groupRef, rigidBodyRef]);
 
     useEffect(() => {
         if (names.length === 0 || !actions) return;
+
+        // アニメーション開始前に初期位置を確実に記録
+        if (groupRef.current && !initialLocalPosRef.current) {
+            const targetNode = findTargetNode(groupRef.current);
+            if (targetNode) {
+                initialLocalPosRef.current = targetNode.position.clone();
+            }
+        }
 
         names.forEach((name) => {
             const action = actions[name];
@@ -182,7 +238,7 @@ export const useEnemyAnimation = (
                 }
             } else if (name === activeName) {
                 action.setLoop(THREE.LoopOnce, 1);
-                action.clampWhenFinished = false;
+                action.clampWhenFinished = true;
                 if (!action.isRunning()) {
                     action.reset().fadeIn(0.2).play();
                 }
@@ -190,7 +246,7 @@ export const useEnemyAnimation = (
                 action.stop();
             }
         });
-    }, [actions, names, sequenceKey, currentIndex, isDefeated, isRushing, isCoolingDown, activeName]);
+    }, [actions, names, sequenceKey, currentIndex, isDefeated, isRushing, isCoolingDown, activeName, groupRef]);
 
     useEffect(() => {
         return () => {
@@ -247,12 +303,14 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
 
     // 突進中かどうかの判定 (Movement配列に "rush" が含まれている、かつ未撃破)
     const isRushing = info.Movement.includes("rush") && !isdefeated;
-    const rushSpeed = 5; // 突進スピード（秒速5ユニット）
 
     // 弾発射タイマー
     const lastShootTime = useRef(0);
+    const spawnTime = useRef<number | null>(null);
     const isBoss = info.type === 'boss';
-    const shootInterval = isBoss ? 2.0 : 3.5; // ボスは2秒毎、通常敵は3.5秒毎に発射
+    const isSlow = info.Movement.includes("slow") && !isdefeated;
+    const shootInterval = isBoss ? 2.0 : isSlow ? 5.0 : 3.5;
+    const initialShootDelay = isSlow ? 2.0 : 0;
 
     const handledefeate = (event: CollisionPayload)=>{
         if (event?.other?.rigidBodyObject?.name === 'bullet') {
@@ -272,10 +330,20 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
         return selectedGltf.animations.map((clip) => clip.clone());
     }, [selectedGltf.animations]);
 
-    useEnemyAnimation(clonedAnimations, groupRef, isdefeated, info.Movement, isRushing);
+    useEnemyAnimation(clonedAnimations, groupRef, isdefeated, info.Movement, isRushing, rigidBodyRef);
 
     // 毎フレームのループ処理（カメラ追従、突進移動、カメラ衝突判定、弾発射）
     useFrame(({ camera, clock }) => {
+        const currentTime = clock.getElapsedTime();
+        if (spawnTime.current === null) {
+            spawnTime.current = currentTime;
+        }
+        const timeSinceSpawn = currentTime - (spawnTime.current ?? currentTime);
+
+        const isRushing = info.Movement.includes("rush") && !isdefeated;
+        const isSlow = info.Movement.includes("slow") && !isdefeated;
+        const slowSpeed = info.Speed ?? 0.2;
+        const rushSpeed = 5;
         if (isdefeated) return;
 
         if (rigidBodyRef.current) {
@@ -310,10 +378,23 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
                     );
                 }
 
+                // 3.5. 遅い敵（slow）処理の実行
+                else if (isSlow) {
+                    const direction = new THREE.Vector3().subVectors(camPos, enemyPos).normalize();
+                    rigidBodyRef.current.setLinvel(
+                        {
+                            x: direction.x * slowSpeed,
+                            y: direction.y * slowSpeed,
+                            z: direction.z * slowSpeed,
+                        },
+                        true
+                    );
+                }
+
                 // 4. 定期的な敵弾の発射処理
                 if (onShootBullet) {
-                    const currentTime = clock.getElapsedTime();
-                    if (currentTime - lastShootTime.current >= shootInterval) {
+                    const canFire = timeSinceSpawn >= initialShootDelay;
+                    if (canFire && currentTime - lastShootTime.current >= shootInterval) {
                         lastShootTime.current = currentTime;
                         
                         // 敵の頭・顔の高さからカメラ（視界中心）へ向けて発射
@@ -343,6 +424,7 @@ export const Enemy = ({ info, onDefeat, onCollidePlayer, onShootBullet }: EnemyP
     return (
         <RigidBody
             ref={rigidBodyRef}
+            name={isBoss ? "boss" : "enemy"}
             colliders="ball"
             restitution={0.01}
             gravityScale={isdefeated ? 1 : 0}

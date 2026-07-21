@@ -25,7 +25,7 @@ export const EnemyBullet = ({ info, onHitPlayer, onDestroy }: EnemyBulletProps) 
     const [isHit, setIsHit] = useState(false);
     
     const lifetimeRef = useRef(info.lifetime ?? 6);
-    const speed = info.speed ?? 12; // 敵弾の速さ (秒速 12 ユニット)
+    const speed = info.speed ?? 8; // 敵弾の速さ (秒速 8 ユニット)
 
     useEffect(() => {
         if (rigidBodyRef.current) {
